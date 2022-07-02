@@ -1,0 +1,10 @@
+.DS_Store
+
+static/img
+trash
+./logs
+*.jpg
+*.png
+ .idea
+db_setting/
+document/
