@@ -1,5 +1,5 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory, jsonify, make_response
-from crawler import step_3_get_open_eye
+from flask import Flask, render_template
+from package.db import sql
 app = Flask(__name__)
 
 @app.route('/')
@@ -12,24 +12,24 @@ def test():
 
 @app.route('/api/movielist')
 def movie_list():
-    movie_list = step_3_get_open_eye.all_zh_data_from_db()
-    movie_list_json = {'data': movie_list}
+    all_movie_list = sql.all_zh_data_from_db()
+    movie_list_json = {'data': all_movie_list}
     return movie_list_json
 
 
 @app.route('/api/movielist/<int:year_min>/<int:year_max>')
 def movie_list_by_year(year_min, year_max):
-    movie_list = step_3_get_open_eye.filter_zh_data_from_db(year_min, year_max)
+    movie_list_year = sql.filter_zh_data_from_db(year_min, year_max)
 
     # print(movie_list)
-    movie_list_json = {'data': movie_list}
+    movie_list_json = {'data': movie_list_year}
     return movie_list_json
 
 @app.route('/api/info/<string:merge_id>')
 def movie_info(merge_id):
-    data = step_3_get_open_eye.zh_data_from_db(merge_id)
-    cast = step_3_get_open_eye.zh_cast_from_db(merge_id)
-    rating = step_3_get_open_eye.rating_from_db(merge_id)
+    data = sql.zh_data_from_db(merge_id)
+    cast = sql.zh_cast_from_db(merge_id)
+    rating = sql.rating_from_db(merge_id)
     data.update(cast)
     data.update(rating)
     print('data', data)
@@ -38,13 +38,13 @@ def movie_info(merge_id):
 @app.route('/title/<string:merge_id>')
 # tt1745960
 def movie_page(merge_id):
-    data = step_3_get_open_eye.zh_data_from_db(merge_id)
+    data = sql.zh_data_from_db(merge_id)
     # print('data', data)
 
-    cast = step_3_get_open_eye.zh_cast_from_db(merge_id)
+    cast = sql.zh_cast_from_db(merge_id)
     # print('cast', cast)
 
-    rating = step_3_get_open_eye.rating_from_db(merge_id)
+    rating = sql.rating_from_db(merge_id)
     # print('rating', rating)
 
     first = data
@@ -53,7 +53,7 @@ def movie_page(merge_id):
     zh_title = first['zh_title']
     text = first['text']
     release_date = first['release_date']
-    video =first['video']
+    video = first['video']
     image = first['image']
     runtime = first['runtime']
 

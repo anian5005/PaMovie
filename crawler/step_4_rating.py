@@ -7,13 +7,8 @@ import mysql.connector
 from db_setting import connect_set
 from webdriver_manager.chrome import ChromeDriverManager
 import json
-from time import sleep
-import string
 from fake_useragent import UserAgent
 from crawler import nlp
-from selenium.webdriver.support.ui import Select
-
-from difflib import SequenceMatcher
 
 config = connect_set.rds.set
 log_path = 'tomato.log'

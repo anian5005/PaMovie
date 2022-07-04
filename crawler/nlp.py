@@ -1,5 +1,5 @@
 import string
-from import SequenceMatcher
+from difflib import SequenceMatcher
 
 # s1 = 'top gun'
 # s2 = 'top gun:'
