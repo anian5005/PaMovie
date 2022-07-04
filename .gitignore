@@ -1,10 +1,12 @@
 .DS_Store
 
 static/img
-trash
-./logs
+*.log
+
 *.jpg
 *.png
- .idea
+*__pycache__
+.idea
 db_setting/
 document/
+trash
