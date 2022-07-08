@@ -33,16 +33,6 @@ def get_cursor(connection):
 def write_imdb_movie_id(tuple):
     # create table
     connection = init_db()
-    cursor = get_cursor(connection)
-    cursor.execute(
-        "CREATE TABLE IF NOT EXISTS movie.imdb_movie_id ("
-        "`imdb_id` varchar(15) PRIMARY KEY,"
-        "`type` varchar(20),"
-        "`title` varchar(255),"
-        "`og_title` varchar(255),"
-        "`year` char(4))"
-                   )
-    connection.commit()
     # (zero_filled_number, title, original_title_name, year)
     cursor = get_cursor(connection)
     row = tuple

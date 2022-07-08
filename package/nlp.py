@@ -5,15 +5,15 @@ from difflib import SequenceMatcher
 # s2 = 'top gun:'
 # s3 = '今天天氣真好'
 
+def preprocess(str):
+    text = str.lower()
+    for char in string.punctuation:
+        text = text.replace(char, " ")
+        return text
+
+
 
 def match_preprocessing(movie_1, movie_2):
-
-
-    def preprocess(str):
-        text = str.lower()
-        for char in string.punctuation:
-            text = text.replace(char, " ")
-            return text
 
     movie_1 = preprocess(movie_1)
     movie_2 = preprocess(movie_2)

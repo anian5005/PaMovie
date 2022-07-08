@@ -316,4 +316,60 @@ def write_search_by_eye_result(tuple):
     print('imdb_id', imdb_id, 'record scrape', '(write_search_by_eye_result)')
     return
 
+<<<<<<< HEAD
 # write_search_by_eye_result( ('Shut In', 'fEatm0884089', '大開眼戒', 'Eyes Wide Shut', 'tt0120663', '1999') )
+=======
+# write_search_by_eye_result( ('Shut In', 'fEatm0884089', '大開眼戒', 'Eyes Wide Shut', 'tt0120663', '1999') )
+
+
+def write_eye_01(row):
+    connection = init_db()
+    cursor = get_cursor(connection)
+    sql = "INSERT IGNORE INTO eye_01 (id, date, time, imdb_id, word, result_count) VALUES (%s,%s,%s,%s,%s,%s)"
+    cursor.execute(sql, row)
+    connection.commit()
+    print('write_eye_01 : sql save')
+
+
+def mark_eye_01(status, imdb_id):
+    connection = init_db()
+    cursor = get_cursor(connection)
+    sql = "UPDATE movie.imdb_movie_id SET eye_01 = %s WHERE imdb_id = %s;"
+    cursor.execute(sql, (status , imdb_id))
+    connection.commit()
+    print('imdb_id', imdb_id, 'record eye_01', 'status', status)
+
+
+def mark_eye_02(status, eye_id):
+    connection = init_db()
+    cursor = get_cursor(connection)
+    sql = "UPDATE movie.eye_02_id SET scrape = %s WHERE eye_id = %s;"
+    cursor.execute(sql, (status, eye_id))
+    connection.commit()
+    print('eye_id', eye_id, 'record eye_02_id', 'status', status, 'finished')
+
+
+def write_eye_02_id(tuple_list):
+    connection = init_db()
+    cursor = get_cursor(connection)
+    sql = "INSERT IGNORE INTO eye_02_id (mongo_start, mongo_end, eye_id) VALUES (%s,%s,%s)"
+    cursor.executemany(sql, tuple_list)
+    connection.commit()
+    print('write_eye_02_id : SQL SAVE')
+
+def get_eye_id_from_sql(start_date, end_date):
+    # create table
+    connection = init_db()
+    cursor = get_cursor(connection, opt=False)
+    date_range = "WHERE (mongo_end BETWEEN '{min}' AND '{max}');".format(min=start_date, max=end_date)
+    sql = "SELECT eye_id FROM movie.eye_02_id " + date_range
+    cursor.execute(sql)
+    out = cursor.fetchall()
+    eye_id_list = [id[0] for id in out]  # ['A12020090204', 'f1en00326716',...]
+    # print(eye_id_list)
+    return eye_id_list
+
+
+# get_eye_id_from_sql('2022-07-05', '2022-07-05')
+
+>>>>>>> sprint_2
