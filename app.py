@@ -1,5 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory, jsonify, make_response
 from crawler import step_3_get_open_eye
+
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -90,4 +92,4 @@ def movie_page(merge_id):
                            yahoo_count=yahoo_count
                            )
 
-app.run(debug=True, port=8000, host="0.0.0.0")
+app.run(debug=True, port=8000, host="0.0.0.0", ssl_context=('ssl/certificate.crt', 'ssl/private.key'))
