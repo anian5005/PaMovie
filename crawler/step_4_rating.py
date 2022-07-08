@@ -10,10 +10,14 @@ import json
 from time import sleep
 import string
 from fake_useragent import UserAgent
+<<<<<<< Updated upstream
 from crawler import nlp
 from selenium.webdriver.support.ui import Select
 
 from difflib import SequenceMatcher
+=======
+from package import nlp
+>>>>>>> Stashed changes
 
 config = connect_set.rds.set
 log_path = 'tomato.log'
@@ -35,35 +39,7 @@ def get_cursor(connection, opt=False):
         connection = init_db()
     return connection.cursor(buffered=True, dictionary=dic_option)
 
-def create_tb_rating():
-    # Create DB movie
-    connection = init_db()
-    cursor = get_cursor(connection)
-    cursor.execute("CREATE DATABASE IF NOT EXISTS rating")
-    connection.commit()
 
-    # Create table rating
-    cursor = get_cursor(connection)
-    cursor.execute("CREATE TABLE IF NOT EXISTS rating ("
-                   "`merge_id` varchar(255) PRIMARY KEY,"
-                  "`imdb_id` varchar(255) UNIQUE,"
-                   "`imdb_score` float,"
-                   "`imdb_count` int,"
-                   "`tomato_meter` int,"
-                   "`tomato_audience` int,"
-                   "`tomato_review_count` int,"
-                   "`tomato_audience_count` int,"
-                   "`meta_score` int,"
-                   "`meta_score_count` int,"
-                   "`meta_user_score` int,"
-                   "`meta_user_count` int,"
-                   "`yahoo_score` float,"
-                   "`yahoo_count` int)"
-                   )
-    connection.commit()
-    return
-
-# create_tb_rating()
 
 
 

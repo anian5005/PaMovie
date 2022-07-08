@@ -3,6 +3,7 @@ import re, time
 from db_setting import connect_set
 from pymongo import MongoClient
 from datetime import datetime
+from package.nlp import preprocess
 
 config = connect_set.rds.set
 mongo = connect_set.mongo.set
@@ -40,6 +41,7 @@ def fuzzy_name(str):
 
     # replace space
     full_str = original.replace('  ', ' ').lstrip(' ').rstrip(' ')
+    clean_str = preprocess(full_str)
     result_list.append(full_str)
 
     # split comma

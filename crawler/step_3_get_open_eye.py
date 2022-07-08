@@ -15,7 +15,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
 import boto3
 from random import randint
-from db_setting import s3_func
+from package.db import s3
 
 config = connect_set.rds.set
 mongo = connect_set.mongo.set
@@ -291,7 +291,7 @@ def crawler_zh_eye_data(id):
             photo_body = requests.get(image_url).content
             photo_name = eye_id + '_main.jpg'
 
-            s3_func.put_photo_to_s3(photo_name='testV4.jpg', photo_stream=photo_body)
+            s3.put_photo_to_s3(photo_name='testV4.jpg', photo_stream=photo_body)
 
 
     video = driver.find_elements(By.CLASS_NAME, 'image.featured')[0].get_attribute('src')
