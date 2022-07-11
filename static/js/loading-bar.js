@@ -745,7 +745,7 @@ out$.presets = presets = {
     "fill-background-extrude": 1,
     "bbox": "10 5 80 10"
   },
-    energy_tomoto: {
+    energy_tomato: {
     "type": 'fill',
     "path": 'M15 5L85 5A5 5 0 0 1 85 15L15 15A5 5 0 0 1 15 5',
     "stroke": '#f00',
