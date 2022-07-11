@@ -32,7 +32,7 @@ def get_cursor(connection, opt=False):
 
 
 def history_movie_db(year):
-    file_path = 'time_log.text'
+    file_path = 'time.log'
     func_name = 'history_movie_db'
 
     for i in range(1, 6):
@@ -50,8 +50,7 @@ def history_movie_db(year):
                 pass
 
     # get id list with eye_01 col null
-    # SELECT * FROM movie.imdb_movie_id  WHERE type ='Movie' and year > %s AND scrape <=> NULL;
-    sql = "SELECT * FROM movie.imdb_movie_id  WHERE type ='Movie' and year > %s and eye_01 <=> NULL;"
+    sql = "SELECT * FROM movie.imdb_movie_id  WHERE type ='Movie' and year = %s and eye_01 <=> NULL;"
     cursor.execute(sql, (year,))
     connection.commit()
     movie_ids = cursor.fetchall()
@@ -109,4 +108,4 @@ def history_movie_db(year):
         #     print('imdb_id', imdb_id, 'scrape NO RESULT', '(write_search_by_eye_result)')
 
 
-history_movie_db('2020')
+history_movie_db('2018')
