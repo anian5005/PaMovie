@@ -45,7 +45,7 @@ input {
 
 
 
-.imdb_rating, .tomoto_rating,.tomato_audience_rating, .yahoo_rating {
+.imdb_rating, .tomato_rating,.tomato_audience_rating, .yahoo_rating {
 	width: 900px;
 	display: flex;
 	align-items: center;
@@ -64,6 +64,7 @@ input {
 }
 
 
+
 .horizontal_line {
     background-color: #444;
     width: 800px;
@@ -78,6 +79,17 @@ input {
 .info_detail{
 	width: 420px;
 
+}
+
+.rating_no_result {
+	font-family:Arial Black,微軟正黑體;
+	font-size: 25px;
+	color: #A9A9A9;
+}
+
+
+p.detail_word {
+width:600px;
 }
 
 
