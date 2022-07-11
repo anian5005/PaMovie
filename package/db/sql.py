@@ -162,9 +162,7 @@ def rating_from_db(merge_id):
 
 # rating_from_db('tt1745960')
 
-
-# insert zh_open_eye_data into table main_info & zh_star % cast
-def write_main_info(dict):
+def create_tb_main_info():
     # Create DB movie
     connection = init_db()
     cursor = get_cursor(connection)
@@ -186,7 +184,6 @@ def write_main_info(dict):
                    "`text` MEDIUMTEXT)"
                    )
     connection.commit()
-
     # Create table star
     cursor = get_cursor(connection)
     # eye_id, zh_name, imdb_id, en_name
@@ -209,6 +206,11 @@ def write_main_info(dict):
                    "UNIQUE KEY `cast_index`(`movie_id`,'type', `person_id`) )"
                    )
     connection.commit()
+
+# insert zh_open_eye_data into table main_info & zh_star % cast
+def write_main_info(dict):
+    connection = init_db()
+    cursor = get_cursor(connection)
 
     # Extract value from input
     row = dict
@@ -316,11 +318,8 @@ def write_search_by_eye_result(tuple):
     print('imdb_id', imdb_id, 'record scrape', '(write_search_by_eye_result)')
     return
 
-<<<<<<< HEAD
-# write_search_by_eye_result( ('Shut In', 'fEatm0884089', '大開眼戒', 'Eyes Wide Shut', 'tt0120663', '1999') )
-=======
-# write_search_by_eye_result( ('Shut In', 'fEatm0884089', '大開眼戒', 'Eyes Wide Shut', 'tt0120663', '1999') )
 
+# write_search_by_eye_result( ('Shut In', 'fEatm0884089', '大開眼戒', 'Eyes Wide Shut', 'tt0120663', '1999') )
 
 def write_eye_01(row):
     connection = init_db()
@@ -328,7 +327,7 @@ def write_eye_01(row):
     sql = "INSERT IGNORE INTO eye_01 (id, date, time, imdb_id, word, result_count) VALUES (%s,%s,%s,%s,%s,%s)"
     cursor.execute(sql, row)
     connection.commit()
-    print('write_eye_01 : sql save')
+    # print('write_eye_01 : sql save')
 
 
 def mark_eye_01(status, imdb_id):
@@ -337,7 +336,7 @@ def mark_eye_01(status, imdb_id):
     sql = "UPDATE movie.imdb_movie_id SET eye_01 = %s WHERE imdb_id = %s;"
     cursor.execute(sql, (status , imdb_id))
     connection.commit()
-    print('imdb_id', imdb_id, 'record eye_01', 'status', status)
+    print('imdb_id', imdb_id, 'record eye_01', 'status', status, 'OK')
 
 
 def mark_eye_02(status, eye_id):
@@ -372,4 +371,3 @@ def get_eye_id_from_sql(start_date, end_date):
 
 # get_eye_id_from_sql('2022-07-05', '2022-07-05')
 
->>>>>>> sprint_2

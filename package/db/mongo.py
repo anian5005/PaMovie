@@ -15,25 +15,18 @@ db = client.movie
 log_path = "mongo.log"
 
 
+
+# SAVE DATA TO MONGO DB eye_01_pages
 def insert_eye_search_result(doc):
-    func_name = 'insert_eye_search_result'
-
-    # SAVE DATA TO MONGO DB
-    try:
-        db.eye_01_pages.insert_one(doc)
-        print(func_name + '\tmongo insert successfully\n')
-    except:
-        with open(log_path, 'a', encoding='utf-8') as f:
-            current_time = datetime.now().strftime('%Y-%m-%d %H:%M')
-            f.write(current_time + '\t' + func_name + '\tinsert failed\n')
+    db.eye_01_pages.insert_one(doc)
+    print('mongo eye_01 insert successfully')
 
 
-
-def create_multi_unique_index(index_name):
+def create_unique_index(index_name):
     try:
 
         db.eye_01_pages.create_index(
-            [("imdb_id",  TEXT), ("keyword",  TEXT)],
+            [("keyword",  TEXT)],
             unique=True, name=index_name
         )
     except Exception as er:
