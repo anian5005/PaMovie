@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory, jsonify, make_response
-from crawler import step_3_get_open_eye
+from package.db import sql
 
 app = Flask(__name__)
 
@@ -52,9 +52,7 @@ def movie_page(merge_id):
 
     movie = first['en_title']
     zh_title = first['zh_title']
-    text = first['text']
     release_date = first['release_date']
-    video = first['video']
     image = first['image']
     runtime = first['runtime']
 
@@ -70,17 +68,19 @@ def movie_page(merge_id):
 
     # print('movie', first)
 
-    dir = cast['dir'][0]
+    if cast.get('dir', None) != None:
+        dirs = cast['dir'][0]
+    else:
+        dirs = 'no result'
+
     return render_template('movie_page.html',
                            movie=movie,
                            zh_title=zh_title,
-                           text=text,
                            release_date=release_date,
-                           video=video,
                            runtime=runtime,
                            rating=rating,
                            image=image,
-                           dir=dir,
+                           dir=dirs,
                            imdb_score=imdb_score,
                            imdb_count=imdb_count,
                            tomato_meter=tomato_meter,
@@ -91,4 +91,5 @@ def movie_page(merge_id):
                            yahoo_count=yahoo_count
                            )
 
-app.run(debug=True, port=8000, host="0.0.0.0", ssl_context=('ssl/certificate.crt', 'ssl/private.key'))
+# app.run(debug=True, port=8000, host="0.0.0.0", ssl_context=('ssl/certificate.crt', 'ssl/private.key'))
+app.run(debug=True, port=8000, host="0.0.0.0")

@@ -20,10 +20,13 @@ import requests
 # get eye search pages with keywords
 # save pages into mongo movie.eye_1_search_result
 
-# 0: no result, status code: 1:ok,  2: error, 3: save sql without mongo (save in eye_01)
-def eye_01(imdb_id, keyword):
+# 0: no result, status code: 1:ok,  2: save serch log to tb eye_01 error
+# 3: save sql without mongo (save in eye_01)
+def eye_01(imdb_id, word):
+    imdb_id = str(imdb_id)
+    search_word = str(word)
     func_name = 'eye_01'
-    log_path = 'eye_data.log'
+    log_path = 'crawler/log/eye_data.log'
 
     start = time.time()
     id = datetime.now().strftime('%m%d%H%M%S')  # 0704224730
@@ -84,7 +87,7 @@ def eye_01(imdb_id, keyword):
             print('except')
             if i == 5:
                 with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write(log_time() + '\t' + 'func: ' + func_name + '\t' + 'keyword' + keyword + '\tloading searchForm to scrape failed\t' + e +'\n')
+                    f.write(log_time() + '\t' + 'func: ' + func_name + '\t' + 'search_word' + search_word + '\tloading searchForm to scrape failed\t' + e +'\n')
                     driver.quit()
                     mark_eye_01(2, imdb_id)
                     return
@@ -99,7 +102,7 @@ def eye_01(imdb_id, keyword):
             print('Error Message', er)
             if i == 5:
                 with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write(log_time() + '\t' + 'func: ' + func_name + '\t' + 'keyword' + keyword + '\tloading searchForm to scrape failed\t' + er +'\n')
+                    f.write(log_time() + '\t' + 'func: ' + func_name + '\t' + 'search_word' + search_word+ '\tloading searchForm to scrape failed\t' + er +'\n')
                     driver.quit()
                     mark_eye_01(2, imdb_id)
                     return
@@ -119,7 +122,7 @@ def eye_01(imdb_id, keyword):
         except Exception as er:
             if t == 5:
                 with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write(log_time() + '\t' + 'func: ' + func_name + '\tsearch\t' + keyword + '\tloading input field failed\t' + er + '\n')
+                    f.write(log_time() + '\t' + 'func: ' + func_name + '\tsearch\t' + search_word + '\tloading input field failed\t' + er + '\n')
                     mark_eye_01(2, imdb_id)
                     return
             else:
@@ -128,16 +131,16 @@ def eye_01(imdb_id, keyword):
     # input movie name
     for i in range(1, 6):
         try:
-            print(func_name, 'search word', keyword)
+            print(func_name, 'search word', search_word)
             search_input = driver.find_element(By.ID, 'search-field')
-            search_input.send_keys(keyword)
+            search_input.send_keys(search_word)
             search_input.submit()
             # sleep(randint(3, 7))
             break
         except:
             if i == 5:
                 with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write(log_time() + '\t' + 'func: ' + func_name + '\tsearch\t' + keyword + '\tsearch_input.submit failed\t' + er + '\n')
+                    f.write(log_time() + '\t' + 'func: ' + func_name + '\tsearch\t' + search_word + '\tsearch_input.submit failed\t' + er + '\n')
                     mark_eye_01(2, imdb_id)
                     driver.quit()
                     return
@@ -148,25 +151,28 @@ def eye_01(imdb_id, keyword):
 
 
     # total result count
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, 'copyright'))
+    )
     try:
         search_result_count = driver.find_element(By.CSS_SELECTOR, 'h2 > font').text.lstrip('(').rstrip(')')
-        print('search_result_count.text', search_result_count)
+        print('search_count', search_result_count)
 
         if int(search_result_count) == 0:
-            driver.close()
             # print('no result and save db log')
             end = time.time()
             spent_time = int(end - start)
-            row = (id, date, spent_time, imdb_id, keyword, search_result_count)
+            row = (id, date, spent_time, imdb_id, search_word, search_result_count)
 
             try:
                 write_eye_01(row)
                 # update scrape result into sql imdb_id
                 mark_eye_01(0, imdb_id)
+                driver.quit()
 
             except Exception as er:
                 with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write(log_time() + '\tfunc:' + func_name + '\tsearch\t' + keyword + '\tsave sql db log failed\t' + er + '\n')
+                    f.write(log_time() + '\tfunc:' + func_name + '\tsearch\t' + search_word + '\tno result and save sql db log failed\t' + er + '\n')
                     mark_eye_01(2, imdb_id)
                     driver.quit()
                     return
@@ -174,25 +180,30 @@ def eye_01(imdb_id, keyword):
         elif int(search_result_count) > 0:
             end = time.time()
             spent_time = int(end - start)
-            row = (id, date, spent_time, imdb_id, keyword, search_result_count)
+            row = (id, date, spent_time, imdb_id, search_word, search_result_count)
             try:
+                # mark sql imdb_id column eye_01
                 write_eye_01(row)
+                print('write_eye_01 : sql save')
                 try:
                     # save the page to  mongodb
                     html_page = driver.page_source
                     date_ymd = datetime.now().strftime('%Y-%m-%d')
-                    doc = {"created_date": date_ymd, 'id': id, 'imdb_id': imdb_id, 'keyword': keyword, 'page': html_page}
+                    doc = {"created_date": date_ymd, 'id': id, 'imdb_id': imdb_id, 'search_word': search_word, 'page': html_page}
                     mongo.insert_eye_search_result(doc)
-                    # mark sql imdb_id column eye_01
-                    write_eye_01(row)
+
                     # update scrape result into sql imdb_id
                     mark_eye_01(1, imdb_id)
-                except:
+                except Exception as mongo_er:
+                    print('mongo_er_start')
+                    with open(log_path, 'a', encoding='utf-8') as f:
+                        current_time = datetime.now().strftime('%Y-%m-%d %H:%M')
+                        f.write(current_time + '\t' + 'func_name ' + '\tmongo.insert_eye_search_result\t' +'imdb_id\t' + imdb_id + '\t'+ search_word + '\tinsert failed\t' + str(mongo_er) + '\n')
                     mark_eye_01(3, imdb_id)
 
             except Exception as er:
                 with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write(log_time() + '\tfunc:' + func_name + '\tsearch\t' + keyword + '\tsave sql db log failed\t' + er +'\n')
+                    f.write(log_time() + '\tfunc:' + func_name + '\tsearch\t' + search_word + '\tmark sql log failed\t' + str(er) +'\n')
                     driver.quit()
                     mark_eye_01(2, imdb_id)
                     return
@@ -200,7 +211,7 @@ def eye_01(imdb_id, keyword):
     except Exception as er:
         with open(log_path, 'a', encoding='utf-8') as f:
             print('final', er)
-            f.write(log_time() + '\tfunc_name\t' + func_name + '\t' + str(er) + '\n')
+            f.write(log_time() + '\tfunc_name\t' + func_name + '\t' + imdb_id + '\t' + word + '\t' +str(er) + '\n')
             # empty page, not zero (word: Champagne!)
             mark_eye_01(2, imdb_id)
             print('save error status')
