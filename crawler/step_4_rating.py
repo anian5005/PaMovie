@@ -6,22 +6,15 @@ from selenium import webdriver
 import mysql.connector
 from db_setting import connect_set
 from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup
 import json
+from time import sleep
 from fake_useragent import UserAgent
-<<<<<<< Updated upstream
-from crawler import nlp
-<<<<<<< HEAD
-=======
-from selenium.webdriver.support.ui import Select
-
-from difflib import SequenceMatcher
-=======
 from package import nlp
->>>>>>> Stashed changes
->>>>>>> sprint_2
+
 
 config = connect_set.rds.set
-log_path = 'tomato.log'
+log_path = 'crawler/log/tomato.log'
 
 def init_db():
 
@@ -92,13 +85,12 @@ def write_imdb_rating(tuple):
     cursor.execute(sql, tuple)
     connection.commit()
 
-# test2 = imdb_rating('tt1745960')
-# write_imdb_rating(test2)
+test2 = imdb_rating('tt0326716')
+write_imdb_rating(test2)
 
 
 
 def tomatometer(merge_id, url):
-
     # Create driver
     options = Options()
     options.add_argument('--headless')
@@ -371,8 +363,16 @@ def tomoto_rating_process(merge_id, target_movie, target_year):
 # tomoto_rating_process('tt1745960', 'Top Gun: Maverick', '2022')
 # tomoto_rating_process('5656', 'Doctor Strange in the Multiverse of Madness', '2022')
 
+
+
+
+
+
+
+
 def yahoo_rating_process(merge_id, target_movie, target_year):
-    home = 'https://movies.yahoo.com.tw/index.html'
+    search_api = 'https://movies.yahoo.com.tw/moviesearch_result.html?movie_type=movie&keyword='
+    url = search_api + target_movie
 
     # Create driver
     user_agent = UserAgent()
@@ -380,67 +380,98 @@ def yahoo_rating_process(merge_id, target_movie, target_year):
 
     options = Options()
     options.add_argument(f'user-agent={random_user_agent}')
-    options.add_argument('--headless')
-    options.add_argument('--no-sandbox')
-    options.add_argument("--window-size=1920,1080")
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+    # options.add_argument('--headless')
+    # options.add_argument('--no-sandbox')
+    # options.add_argument("--window-size=1920,1080")
 
+    # create driver
+    for i in range(1, 6):
+        try:
+            driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+            break
+        except:
+            if i == 5:
+                return
+            else:
+                pass
     # Loading home page, try 5 times
     for times in range(1, 6):
         try:
             # Wait to load the page
-            driver.get(home)
+            driver.get(url)
             WebDriverWait(driver, 7).until(
-                EC.presence_of_element_located((By.ID, "serchinput"))
+                EC.presence_of_element_located((By.CLASS_NAME, "btn_plus_more"))
             )
             break
         except:
             if times == 5:
                 with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write('func: tomoto_search\t' + target_movie + '\tloading index page to scrape failed\n')
+                    f.write('func: 0000000000000\t' + target_movie + '\t000000000000000000\n')
+                    driver.quit()
             else:
                 pass
+    sleep(8)
+    page = driver.page_source
+    soup = BeautifulSoup(page, 'lxml')
 
-    # page = driver.page_source
     # print(page)
-    driver.find_element(By.ID, "serchinput").send_keys(target_movie)
-    button = driver.find_element(By.CSS_SELECTOR, "button.serch_movie.gabtn")
-    button.click()
+    try:
+        searchpage = soup.findAll('div', {'class': 'searchpage'})
 
-    # search page show
-    # Loading home page, try 5 times
-    for times in range(1, 6):
         try:
-            # Wait to load the page
-            WebDriverWait(driver, 7).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "select[name='movie_type']"))
-            )
-            break
-        except:
-            if times == 5:
-                with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write('func: yahoo_search\t' + target_movie + '\tloading search result page to scrape failed\n')
-            else:
-                pass
-    type_selector = driver.find_element(By.CSS_SELECTOR, "select[name='movie_type']")
-    print('type_selector', type_selector.get_attribute('innerHTML'))
-    # <option value="movie">院線電影</option>
-    # type_selector.select_by_value("movie")
-    type_selector.click()
-    driver.find_element(By.CSS_SELECTOR, "option[value='movie']").click()
-    WebDriverWait(driver, 3).until(
-        EC.element_to_be_clickable((By.XPATH, '//div[text()="查詢"]')))
+            # if result != None
+            for type_div in searchpage:
+                # print('type_div', type_div)
+                # print(type_div.get_attribute('innerHTML'))
+                search_num_div = type_div.find('div', {'class': 'search_num _c'})
+                result_type = search_num_div.text
+                if '作品搜尋結果' in result_type:
+                    # print('result_type', result_type)
+                    release_list = type_div.find('ul', {'class': 'release_list mlist'})
+                    li_list = release_list.findALL('li')
+                    for card in li_list:
+                        print('card', card)
+                        searchpage_info = card.find('div', {'class': 'searchpage_info'})
+                        release_movie_name = searchpage_info.find('div', {'class': 'release_movie_name'})
+                        zh_name = release_movie_name.find('a').text
+                        en_name = release_movie_name.find('div', {'class': 'en'}).text
+                        release_date = release_movie_name.find('div', {'class': 'time'}).text.replace('上映日期', '').replace(':', '').strip()  # 2021-01-15
+                        year = release_date.split('-')[0]
+                        print('zh_name', zh_name, 'en_name', en_name)
+                        print('release_date', release_date)
 
-    driver.find_element(By.XPATH, '//div[text()="查詢"]').click()
+                        # count movie name ratio
+                        try:
+                            if target_year != '' and year != '':
+                                ratio = nlp.match_preprocessing(target_movie, en_name)
+                                print('ratio', ratio)
+                                if ratio > 0.8 and abs(int(target_year) - int(year)) < 2:
 
-    # try:
-    #     driver.find_element(By.ID, "serchinput").send_keys(target_movie)
-    #     button = driver.find_element(By.CSS_SELECTOR, "button[class='serch_movie gabtn']")
-    #     button.click()
-    # except:
-    #     print('error')
+                                    print('HIT！！！', 'zh_name', zh_name, 'en_name', en_name)
+
+                        except Exception as er:
+                            print('can not matcher by year or name', er)
+
+
+                        print('-----------------------------')
+
+        except Exception as er:
+            driver.quit()
+            print(er)
+            print('no movie result' + '\t' + er)
+
+    except Exception as er:
+        driver.quit()
+        print(er)
+        print('no search result'  + '\t' + er)
+
+
+
 
 # yahoo_rating_process('123', 'up', 2022)
+
+
+
 
 
 def test():
@@ -474,4 +505,4 @@ def test():
 
 
 
-test()
+# test()

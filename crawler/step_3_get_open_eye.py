@@ -14,11 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from time import sleep
 import boto3
 from random import randint
-<<<<<<< HEAD
-from package.db import sql, s3_func
-=======
-from package.db import s3
->>>>>>> sprint_2
+from package.db import s3, sql
 
 config = connect_set.rds.set
 mongo = connect_set.mongo.set
