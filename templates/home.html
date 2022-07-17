@@ -1,33 +1,31 @@
 <!DOCTYPE HTML>
 
 <html>
+
     <head>
         <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='img/pa_logo.ico')}}">
         <meta charset="utf-8">
-        <title>HOME</title>
+        <title>Pa Movie</title>
 
         <link rel="stylesheet"  href="{{url_for('static', filename='css/home_style.css')}}">
         <script src="{{url_for('static', filename='js/home.js')}}"></script>
         <link rel="stylesheet"  href="{{url_for('static', filename='css/home_slider.css')}}">
     </head>
+    <BODY>
 
-
-<BODY>
         <header>
             <nav>
                 <a href="/">
                     <img src="{{url_for('static', filename='img/word_logo-removebg-preview.png')}}" width="250px" display="inline" >
                 </a>
 
-<!--                <form method="get" action="https://tw.search.yahoo.com/search" target="_blank" >-->
-<!--                    <input id="serchinput" name="p" type="text" placeholder="搜尋" autocomplete="off">-->
-<!--                    <div class="inputex" style="visibility:hidden"></div>-->
-<!--                    <input type="hidden" id="fr" name="fr" value="ush-movies">-->
-<!--                </form>-->
+    <!--                <form method="get" action="https://tw.search.yahoo.com/search" target="_blank" >-->
+    <!--                    <input id="serchinput" name="p" type="text" placeholder="搜尋" autocomplete="off">-->
+    <!--                    <div class="inputex" style="visibility:hidden"></div>-->
+    <!--                    <input type="hidden" id="fr" name="fr" value="ush-movies">-->
+    <!--                </form>-->
             </nav>
         </header>
-
-
         <div class="filter" id="year">
             <div class="filter_container">
                 <h2>Year</h2>
@@ -47,75 +45,46 @@
                 </div>
             </div>
         </div>
+    <!--        <div class="filter">-->
 
+    <!--            <div class="filter_container">-->
+    <!--                <img id= 'imdb_icon'src="{{url_for('static', filename='img/imdb_icon.png')}}" alt="imdb_icon" width="100px" display="inline">-->
 
-<!--        <div class="filter">-->
-
-<!--            <div class="filter_container">-->
-<!--                <img id= 'imdb_icon'src="{{url_for('static', filename='img/imdb_icon.png')}}" alt="imdb_icon" width="100px" display="inline">-->
-
-<!--                <div class="middle">-->
-<!--                    <div class="multi-range-slider IMDB">-->
-<!--                        <input type="range" id="input-left_IMDB" min="0" max="5" value="4.5">-->
-<!--                        <input type="range" id="input-right_IMDB" min="0" max="5" value="5">-->
-<!--                        <div class="slider IMDB">-->
-<!--                            <div class="track"></div>-->
-<!--                            <div class="range"></div>-->
-<!--                            <div class="thumb left"></div>-->
-<!--                            <div class="thumb right"></div>-->
-<!--                            <span class="showe left-s">1</span>-->
-<!--                            <span class="showe right-s">2</span>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-
-
-
-
+    <!--                <div class="middle">-->
+    <!--                    <div class="multi-range-slider IMDB">-->
+    <!--                        <input type="range" id="input-left_IMDB" min="0" max="5" value="4.5">-->
+    <!--                        <input type="range" id="input-right_IMDB" min="0" max="5" value="5">-->
+    <!--                        <div class="slider IMDB">-->
+    <!--                            <div class="track"></div>-->
+    <!--                            <div class="range"></div>-->
+    <!--                            <div class="thumb left"></div>-->
+    <!--                            <div class="thumb right"></div>-->
+    <!--                            <span class="showe left-s">1</span>-->
+    <!--                            <span class="showe right-s">2</span>-->
+    <!--                        </div>-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
         <div class=article>
             <div class="container" id = "container"></div>
         </div>
 
+        <!--slider-->
+        <script>
+            function get_new_movie() {
+                <!--get min & max-->
+                let showeL = document.querySelector(".slider.year > .left-s");
+                let showeR = document.querySelector(".slider.year > .right-s");
+                year_min = showeL.textContent;
+                year_max = showeR.textContent;
+                console.log('year_min', year_min)
+                console.log('year_max', year_max)
+                update_data_by_slider(year_min, year_max)
+            }
+        </script>
+        <script src="{{url_for('static', filename='js/home_slider.js')}}"></script>
 
-
-
-
-<!--slider-->
-<script>
-    function get_year_filter() {
-
-        let showeL = document.querySelector(".slider.year > .left-s");
-        let showeR = document.querySelector(".slider.year > .right-s");
-        year_min = showeL.textContent
-        year_max = showeR.textContent
-        console.log('year_min', year_min)
-        console.log('year_max', year_max)
-
-        var node = document.getElementById('container');
-        node.remove()
-
-        var div_el= document.createElement('div');
-        div_el.classList.add('class', 'container');
-        div_el.setAttribute("id", 'container');
-
-        var parent = document.getElementsByClassName('article')[0]
-        parent.appendChild(div_el);
-
-        filter_movie_list(year_min, year_max)
-    }
-
-
-</script>
-<script src="{{url_for('static', filename='js/home_slider.js')}}"></script>
-
-
-</BODY>
-
-
-
-
-
+    </BODY>
 </html>
 
