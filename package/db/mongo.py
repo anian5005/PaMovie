@@ -22,6 +22,19 @@ def insert_eye_search_result(doc):
     print('mongo eye_01 insert successfully')
 
 
+def insert_many_eye_search_result(doc_list):
+    print('doc_list', doc_list)
+    print()
+    db.test.insert_many(doc_list)
+    print('mongo test insert Many successfully')
+
+def insert_test(doc):
+    print('doc_list', doc)
+    print()
+    db.test.insert(doc)
+    print('mongo test insert Many successfully')
+
+
 def create_unique_index(index_name):
     try:
 

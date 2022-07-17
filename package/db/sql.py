@@ -3,6 +3,9 @@ from db_setting import connect_set
 
 config = connect_set.rds.set
 
+
+
+
 def init_db():
 
     return mysql.connector.connect(
@@ -10,7 +13,6 @@ def init_db():
         user=config['user'],
         password=config['password'],
         database='movie')
-
 
 def get_cursor(connection, opt=False):
     dic_option = opt
@@ -81,7 +83,27 @@ def zh_data_from_db(merge_id):
     # create table
     connection = init_db()
     cursor = get_cursor(connection, opt=True)
-    sql = "SELECT merge_id, eye_id, en_title, zh_title, runtime, release_date, video, image, text FROM movie.main_info WHERE merge_id = %s"
+    sql = """SELECT 
+                main_info.merge_id, 
+                eye_id, 
+                en_title, 
+                zh_title, 
+                runtime, 
+                release_date, 
+                video, image, 
+                imdb_score, 
+                imdb_count,
+                tomato_meter,
+                tomato_audience,
+                tomato_review_count,
+                tomato_audience_count,
+                meta_score,
+                meta_score_count,
+                meta_user_score,
+                meta_user_count,
+                yahoo_count,
+                yahoo_score
+                FROM movie.rating INNER JOIN movie.main_info ON movie.main_info.merge_id = movie.rating.merge_id where main_info.merge_id = %s;"""
     cursor.execute(sql, (merge_id,))
     out = cursor.fetchall()
     if out != []:
@@ -93,6 +115,52 @@ def zh_data_from_db(merge_id):
         return None
 # zh_data_from_db()
 
+def movie_page_data(merge_id):
+    connection = init_db()
+    cursor = get_cursor(connection, opt=True)
+    sql = """SELECT *
+                FROM movie.rating 
+                LEFT JOIN movie.main_info ON movie.main_info.merge_id = movie.rating.merge_id
+                LEFT JOIN movie.cast ON cast.merge_id = main_info.merge_id
+                LEFT JOIN movie.star ON cast.person_id = star.person_id
+                where main_info.merge_id = %s;"""
+    cursor.execute(sql, (merge_id,))
+    row_list = cursor.fetchall()
+    connection.commit()
+
+    # movie main info
+    general = row_list[0].copy()
+    for k in ['text', 'person_id', 'zh_name', 'type', 'en_name']:
+        general.pop(k, None)
+    # print(general)
+    # movie cast
+    cast_dict = {}
+
+    for staff in row_list:
+        type = staff['type']
+        name = staff['zh_name']
+        # print('staff', staff)
+        if type =='dir':
+            if cast_dict.get('dir', None) != None:
+                cast_dict['dir'].append(name)
+            else:
+                cast_dict['dir']= [name]
+
+        if type =='star':
+            if cast_dict.get('star', None) != None:
+                cast_dict['star'].append(name)
+            else:
+                cast_dict['star'] = [name]
+
+        if type =='wrtr':
+            if cast_dict.get('wrtr', None) != None:
+                cast_dict['wrtr'].append(name)
+            else:
+                cast_dict['wrtr'] = [name]
+
+    return general, cast_dict
+
+# movie_page_data('tt1745960')
 
 # output: {'dir': ['喬瑟夫柯辛斯基'], 'star': ['湯姆克魯斯', '麥爾斯泰勒', '方基墨', '珍妮佛康納莉', '喬漢姆', '路易斯普曼', '格蘭鮑威爾', '摩妮卡巴巴羅']}
 def zh_cast_from_db(merge_id):
@@ -370,4 +438,32 @@ def get_eye_id_from_sql(start_date, end_date):
 
 
 # get_eye_id_from_sql('2022-07-05', '2022-07-05')
+
+def create_eye_01_log():
+    connection = init_db()
+
+    # Create table movie.main_info
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS eye_01_log ("
+                   "`log_time`DATE,"
+                   "`imdb_id` varchar(255),"
+                   "`word` varchar(255),"
+                   "`time` float,"
+                   "`status` int,"
+                   "`result_count` int,"
+                   "`msg` varchar(255),"
+                   "UNIQUE(imdb_id, word))"
+                   )
+    connection.commit()
+
+create_eye_01_log()
+
+
+def write_eye_01_log(tuple_list):
+    connection = init_db()
+    cursor = get_cursor(connection)
+    sql = "INSERT IGNORE INTO eye_01_log (log_time, imdb_id, word, time, status, result_count, msg) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+    cursor.executemany(sql, tuple_list)
+    connection.commit()
+    print('write_eye_01_log : SQL SAVE')
 
