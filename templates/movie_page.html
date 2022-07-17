@@ -2,42 +2,33 @@
 
 <html>
 <head>
-    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='img/pa_logo.ico')}}">
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='img/pa_logo.ico')}}" >
     <meta charset="utf-8">
-    <title>Movie Page</title>
+    <title>Pa Movie</title>
     <link rel="stylesheet"  href="{{url_for('static', filename='css/style.css')}}">
     <link rel="stylesheet"  type="text/css" href="{{url_for('static', filename='css/loading-bar.css')}}">
 </head>
 
 <BODY >
-
-
-
     <header>
         <nav>
             <a href="/">
                 <img src="{{url_for('static', filename='img/word_logo-removebg-preview.png')}}" width="250px" display="inline" >
             </a>
-
 <!--            <form method="get" action="https://tw.search.yahoo.com/search" target="_blank" >-->
 <!--                <input id="serchinput" name="p" type="text" placeholder="搜尋" autocomplete="off">-->
 <!--                <div class="inputex" style="visibility:hidden"></div>-->
 <!--                <input type="hidden" id="fr" name="fr" value="ush-movies">-->
 <!--            </form>-->
         </nav>
-
     </header>
-
 
     <div class="movie_info">
         <h1>{{zh_title}}</h1>
-
         <div class="info_body">
-            
             <div class="photo">
-                <img id= 'imdb_icon' src={{image}} width="200px">
+                <img id='imdb_icon' src={{image}} width="200px">
             </div>
-
             <div class="info_detail">
                 <p class="detail_word">原名 : {{movie}}</p>
                 <p class="detail_word">導演 : {{dir}}</p>  
@@ -45,102 +36,26 @@
                 <p class="detail_word">片長 : {{runtime}} 分鐘</p>  
             </div>
         </div>
-
-                      
     </div>
 
     <div class="rating_container">
         <h1>Movie Ratings</h1>
-
-<!--            <div class="imdb_rating">-->
-<!--                <img src="{{url_for('static', filename='img/imdb_icon.png')}}" alt="imdb_icon" width="100px" display="inline">-->
-<!--                <p class="rating_name">IMDb RATING</p>-->
-<!--                <p>{{imdb_score}}/10 </p>-->
-<!--                <p>{{imdb_count}} Reviews</p>-->
-<!--                <div id='imdb' data-preset="energy_imdb" class="ldBar label-center" data-value="0" style="width:300px; height:60px", ></div>-->
-<!--            </div>-->
-
-
-<!--            <div class="tomato_rating">-->
-<!--                <img src="{{url_for('static', filename='img/tomato_icon.png')}}" alt="tomato_icon" width="100px" display="inline">-->
-<!--                <p class="rating_name">TOMATOMETER</p>-->
-<!--                <p>{{tomato_meter}}/100</p>-->
-<!--                <p>{{tomato_review_count}} Reviews</p>-->
-<!--                <div id='tomato_meter' data-preset="energy_tomato" class="ldBar label-center" data-value="0" style="width:300px; height:60px"></div>-->
-<!--            </div>-->
-
-
-<!--            <div class="tomato_audience_rating">-->
-<!--                <img src="{{url_for('static', filename='img/tomato_icon.png')}}" alt="tomato_icon" width="100px" display="inline">-->
-<!--                <p class="rating_name">AUDIENCE SCORE<p>-->
-<!--                <p>{{tomato_audience}}/100</p>-->
-<!--                <p>{{tomato_audience_count}}+ Reviews</p>-->
-<!--                <div id='tomato_audience' data-preset="energy_tomato" class="ldBar label-center" data-value="0" style="width:300px; height:60px";></div>-->
-<!--            </div>-->
-
-
-<!--            <div class="yahoo_rating">-->
-<!--                <img src="{{url_for('static', filename='img/yahoo_icon.png')}}" alt="yahoo_icon" width="100px" display="inline">-->
-<!--                <p class="rating_name">YAHOO SCORE<p>-->
-<!--                <p>{{yahoo_score}}/5</p>-->
-<!--                <p>{{yahoo_count}} Reviews</p>-->
-<!--                <div id='yahoo' data-preset="energy_yahoo" class="ldBar label-center" data-value="0" style="width:300px; height:60px";></div>-->
-<!--            </div>-->
     </div>
-
-
-    <div class="rating_test"></div>
-
-<!--     <div>
-        <div class="col mb-5 h-100">
-            <iframe width="560" height="315" src="{{video}}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-    </div> -->
-
-
+<script type="text/javascript" src="{{url_for('static', filename='js/movie_page.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/loading-bar.js')}}"></script>
 
     <script>
         var rating_dict = {{rating|tojson}};
-
-        var imdb_score = (rating_dict['imdb_score'])
-        var imdb_count = rating_dict['imdb_count']
-
-        var tomato_meter = rating_dict['tomato_meter']
-        var tomato_audience = rating_dict['tomato_audience']
-        var tomato_review_count = rating_dict['tomato_review_count']
-        var tomato_audience_count = rating_dict['tomato_audience_count']
-
-        var yahoo_score = rating_dict['yahoo_score']
-        var yahoo_count = rating_dict['yahoo_count']
+        var imdb_score = rating_dict['imdb_score'];
+        var imdb_count = rating_dict['imdb_count'];
+        var tomato_meter = rating_dict['tomato_meter'];
+        var tomato_audience = rating_dict['tomato_audience'];
+        var tomato_review_count = rating_dict['tomato_review_count'];
+        var tomato_audience_count = rating_dict['tomato_audience_count'];
+        var yahoo_score = rating_dict['yahoo_score'];
+        var yahoo_count = rating_dict['yahoo_count'];
         console.log('tomato_meter', tomato_meter)
-    </script>
 
-
-    <script>
-<!--    var imdb_div = document.getElementById('imdb');-->
-<!--    imdb_div.setAttribute("data-value", imdb_score);-->
-
-
-<!--    var tomato_meter_div = document.getElementById('tomato_meter');-->
-<!--    tomato_meter_div.setAttribute("data-value", tomato_meter);-->
-
-<!--    var tomato_audience_div = document.getElementById('tomato_audience');-->
-<!--    tomato_audience_div.setAttribute("data-value", tomato_audience);-->
-
-<!--    var yahoo_div = document.getElementById('yahoo');-->
-<!--    yahoo_div.setAttribute("data-value", yahoo_score);-->
-
-
-
-
-
-
-
-    </script>
-
-    <script type="text/javascript" src="{{url_for('static', filename='js/movie_page.js')}}"></script>
-
-    <script>
             var result = 0
             if (imdb_score != null && imdb_score != 0) {
                 result = result +1;
@@ -154,12 +69,10 @@
                 result = result +1;
                 create_imdb_rating('tomato_audience', 'AUDIENCE SCORE', tomato_audience, tomato_audience_count)
             };
-
             if (yahoo_score != null && yahoo_score != 0) {
                 result = result +1;
                 create_imdb_rating('yahoo', 'YAHOO SCORE', yahoo_score, yahoo_count)
             };
-
             if (result === 0) {
                 var p_result= document.createElement('p');
                 p_result.classList.add('rating_no_result');
@@ -167,17 +80,8 @@
                 p_result.appendChild(p_result_text);
                 var position = document.getElementsByClassName('rating_container')[0];
                 position.appendChild(p_result);
-
             }
-
     </script>
-
-
-<script type="text/javascript" src="{{url_for('static', filename='js/loading-bar.js')}}"></script>
-
-
-
-
 </BODY>
 
 

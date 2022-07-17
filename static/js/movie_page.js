@@ -1,4 +1,4 @@
-
+console.log('movie_page.JS')
 // make movie rating info
 function create_imdb_rating(class_name, rating_name, value, count) {
 
@@ -91,7 +91,6 @@ function movie_info(){
         if(xhr.status == 200){
             console.log('xhr.status', xhr.status);
             var data = JSON.parse(this.responseText);
-            console.log('111', data);
 //
 //            var imdb_score = data['imdb_score']
 //            var imdb_count = data['imdb_count']
@@ -102,9 +101,6 @@ function movie_info(){
         }
     }
 }
-
-
-
 
 
 
