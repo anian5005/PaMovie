@@ -1,33 +1,25 @@
 .ldBar {
-  position: relative;
-  font-size: 0.5 em;
-  color: black;
+	position: relative;
+	font-size: 0.5 em;
+	color: black;
 }
-
-
- .ldBar-label {
-    color: #09f;
-  }
-
-
+.ldBar-label {
+	color: #09f;
+}
 .ldBar.label-center > .ldBar-label {
-  color:white;
-
-
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  text-shadow: 0 0 3px #fff;
+	color: white;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-webkit-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+	text-shadow: 0 0 3px #fff;
 }
-
-
-.ldBar-label:after {
-  content: "%";
-  display: inline;
-  color: white;
+.ldBar-label: after {
+	content: "%";
+	display: inline;
+	color: white;
 }
-.ldBar.no-percent .ldBar-label:after {
-  content: "";
+.ldBar.no-percent .ldBar-label: after {
+	content: "";
 }
