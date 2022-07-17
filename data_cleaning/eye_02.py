@@ -21,7 +21,7 @@ def extract_eye_id(str):
 # output: eye_id list
 def eye_02_clean_page(start_date, end_date):
 
-    log_path = 'eye_02.log'
+    log_path = '../crawler/log/eye_02.log'
     func_name = 'eye_02_clean_page'
     start = time.time()
 

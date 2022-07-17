@@ -174,7 +174,7 @@ def clean_one_detail_page(doc_dict):
                 imdb_id = imdb_id_filter(li_a_href)
                 print('imdb_id', imdb_id)
         except Exception as er:
-            with open('test.log', 'a', encoding='utf-8') as f:
+            with open('../crawler/log/test.log', 'a', encoding='utf-8') as f:
                 print('final', er)
                 f.write(log_time() + '\tfunc_name\t' + func_name + '\t' + str(er) + '\n')
 
@@ -199,23 +199,6 @@ def clean_one_detail_page(doc_dict):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def eye_04_clean_detail(start, end):
     eye_3_detail_docs = get_mongo_eye_03_detail(start, end)
     for idx, doc in enumerate(eye_3_detail_docs):
@@ -225,6 +208,4 @@ def eye_04_clean_detail(start, end):
 
 
 
-
-
-eye_04_clean_detail('2022-07-07', '2022-07-07')
+# eye_04_clean_detail('2022-07-07', '2022-07-07')

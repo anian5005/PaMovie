@@ -5,19 +5,19 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
-from package.db.sql import get_eye_id_from_sql
 from time import sleep
 import requests
-from package.general import log_time
-from package.db import s3
-from package.db.mongo import insert_mongo_eye_03_movie_page
-from package.db.sql import mark_eye_02
 from datetime import datetime
-import urllib
+
+from package.general import log_time
+from package.db.s3 import put_photo_to_s3
+from package.db.sql import mark_eye_02, get_eye_id_from_sql
+from package.db.mongo import insert_mongo_eye_03_movie_page
 
 
 
-log_path = 'eye_03.log'
+
+log_path = 'log/eye_03.log'
 
 # output: save movie page to mongo
 # status code: {1:ok, 2: error, 3: save without img} (save in eye_02)
@@ -123,7 +123,7 @@ def scrape_movie_page(eye_id):
                         if image.find_elements(By.TAG_NAME, 'img'):
                             img_element = image.find_element(By.TAG_NAME, 'img')
                             photo_name = eye_id + '_main.jpg'
-                            s3.put_photo_to_s3(photo_name=photo_name, photo_stream=img_element.screenshot_as_png)
+                            put_photo_to_s3(photo_name=photo_name, photo_stream=img_element.screenshot_as_png)
                             mark_eye_02(1, eye_id)
                 except Exception as e:
                     print('try except s3')
@@ -173,6 +173,7 @@ def eye_03_scrape(start_date, end_date):
                 with open(log_path, 'a', encoding='utf-8') as f:
                     f.write(
                         log_time() + '\t' + 'func: ' + func_name + '\t' + 'get_eye_id_from_sql failed' + '\t' + e + '\n')
+                return
             else:
                 pass
 
