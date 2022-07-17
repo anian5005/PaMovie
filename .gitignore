@@ -2,6 +2,7 @@
 
 static/img
 *.log
+crawler/log/
 
 *.jpg
 *.png
