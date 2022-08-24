@@ -2,7 +2,7 @@
 
 static/img
 *.log
-crawler/log/
+trash/old_version/log/
 
 *.jpg
 *.png
@@ -11,5 +11,5 @@ crawler/log/
 db_setting/
 document/
 trash
-ssl
-test
+document/ssl
+trash/test

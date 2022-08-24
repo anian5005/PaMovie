@@ -14,7 +14,7 @@ from package import nlp
 
 
 config = connect_set.rds.set
-log_path = 'crawler/log/tomato.log'
+log_path = '../trash/old_version/log/tomato.log'
 
 def init_db():
 

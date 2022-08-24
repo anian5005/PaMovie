@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from package.db.sql import all_zh_data_from_db, filter_zh_data_from_db, zh_data_from_db,movie_page_data,zh_cast_from_db
+from package.db.sql_temp import all_zh_data_from_db, filter_zh_data_from_db, zh_data_from_db,movie_page_data,zh_cast_from_db
 
 app = Flask(__name__)
 
@@ -61,7 +61,6 @@ def movie_page(merge_id):
         tomato_audience_count = general['tomato_audience_count']
         yahoo_score = general['yahoo_score']
         yahoo_count = general['yahoo_count']
-
 
         if cast_dict.get('dir', None) != None:
             dirs = cast_dict['dir'][0]
