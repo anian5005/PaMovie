@@ -15,38 +15,6 @@ def create_tb_imdb_id():
                    )
     connection.commit()
 
-def create_tb_eye_01():
-    # Create table rating
-    connection = init_db()
-    cursor = get_cursor(connection)
-    cursor.execute("CREATE TABLE IF NOT EXISTS eye_01 ("
-                   "`id` int PRIMARY KEY,"
-                   "`date` char(10),"
-                  "`time` int,"
-                   "`imdb_id` varchar(255),"
-                   "`word` varchar(255),"
-                   "`result_count` int,"
-                   "UNIQUE KEY(imdb_id, word) )"
-                   )
-    connection.commit()
-
-
-
-
-def create_tb_eye_02_id():
-    # Create table rating
-    connection = init_db()
-    cursor = get_cursor(connection)
-    cursor.execute("CREATE TABLE IF NOT EXISTS eye_02_id ("
-                   "`mongo_start` char(10),"
-                   "`mongo_end` char(10),"
-                   "`eye_id` varchar(255) PRIMARY KEY )"
-                   )
-    connection.commit()
-
-create_tb_eye_02_id()
-
-
 def create_tb_rating():
     # Create DB movie
     connection = init_db()
@@ -75,3 +43,160 @@ def create_tb_rating():
     connection.commit()
     return
 # create_tb_rating()
+
+def create_table_error_log():
+    connection = init_db()
+
+    # Create table movie.main_info
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS error_log ("
+                   "`file_name` varchar(255),"
+                   "`func_name`varchar(255),"
+                   "`log_time`datetime,"
+                   "`imdb_id` varchar(255),"
+                   "`spent` float,"
+                   "`status_code` int,"
+                   "`exc_type` varchar(255),"
+                   "`line` varchar(255),"
+                   "`msg` varchar(255))"
+                   )
+    connection.commit()
+
+def create_table_data_processing_log():
+    connection = init_db()
+
+    # Create table movie.main_info
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS data_processing_log ("
+                   "`file_name` varchar(255),"
+                   "`func_name`varchar(255),"
+                   "`log_time`datetime,"
+                   "`imdb_id` varchar(255),"
+                   "`spent` float,"
+                   "`status_code` int)"
+                   )
+    connection.commit()
+
+
+
+def create_table_processing_finished_log():
+    connection = init_db()
+
+    # Create table movie.main_info
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS processing_finished_log ("
+                   "`file_name` varchar(255),"
+                   "`func_name` varchar(255),"
+                   "`start` datetime,"
+                   "`end` datetime,"
+                   "`spent` float,"
+                   "`status_code` int,"
+                   "`result_count` int)"
+                   )
+    connection.commit()
+
+def create_table_douban():
+    connection = init_db()
+
+    # Create table movie.main_info
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS douban ("
+                   "`douban_id`varchar(255),"
+                   "`imdb_id` varchar(255),"
+                   "`year` int)"
+                   )
+    connection.commit()
+
+# create_table_douban()
+def create_table_mapping():
+    connection = init_db()
+    # Create table movie.mapping
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS web_id_mapping ("
+                   "`imdb_id` varchar(255),"
+                   "`douban_id` int,"
+                   "`tomoto` varchar(255),"
+                   "`yahoo` int)"
+                   )
+    connection.commit()
+
+def create_table_plot():
+    connection = init_db()
+    # Create table movie.mapping
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS plot ("
+                   "`imdb_id` varchar(255),"
+                   "`zh_plot` TEXT,"
+                   "`en_plot` TEXT)"
+                   )
+    connection.commit()
+
+def create_table_genre_type():
+    connection = init_db()
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS genre_type ("
+                  "`genre_id` int auto_increment PRIMARY KEY,"
+                   "`genre` varchar(40) UNIQUE )"
+                   )
+    connection.commit()
+
+def create_table_movie_genre():
+    connection = init_db()
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS movie_genre ("
+                   "`imdb_id` varchar(255),"
+                    "`genre_id` int )"
+                   )
+    connection.commit()
+
+# create_table_movie_genre()
+def create_table_movie_info():
+    connection = init_db()
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS movie_info ("
+                  "`imdb_id` varchar(255) PRIMARY KEY,"
+                   "`tw_name` varchar(255),"
+                   "`en_name` varchar(255),"
+                   "`runtime` int,"
+                   "`published` char(12),"
+                   "`genre` varchar(255),"
+                   "`img` varchar(255))"
+                   )
+    connection.commit()
+
+def create_table_other_names():
+    connection = init_db()
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS other_names ("
+                  "`imdb_id` varchar(255) PRIMARY KEY,"
+                   "`lang_type` varchar(10),"
+                   "`name` varchar(20))"
+                   )
+    connection.commit()
+
+# create_table_other_names()
+
+def create_table_staff():
+    connection = init_db()
+    # Create table movie.mapping
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS staff ("
+                   "`imdb_movie` varchar(255),"
+                   "`job_type` varchar(255),"
+                   "`imdb_per` varchar(255),"
+                   "`douban_per` varchar(255))"
+                   )
+    connection.commit()
+
+def create_table_celebrity():
+    connection = init_db()
+    # Create table movie.mapping
+    cursor = get_cursor(connection)
+    cursor.execute("CREATE TABLE IF NOT EXISTS celebrity ("
+                   "`imdb_per` varchar(255),"
+                   "`en_name` varchar(255),"
+                   "`douban_per` varchar(255),"
+                   "`zh_name` varchar(255))"
+                   )
+    connection.commit()
+
