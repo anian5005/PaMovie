@@ -1,9 +1,25 @@
 import mysql.connector
+import sqlalchemy
+from sqlalchemy.pool import QueuePool
 from db_setting import connect_set
+import inspect
+import os
+import time
+from datetime import datetime
+import sys
+from package.general import get_current_taiwan_time_str, taiwan_time_converter, get_current_taiwan_datetime, timedelta_second_converter
 
 config = connect_set.rds.set
 
+def create_conn_pool():
+    conn_str = "mysql+pymysql://local:{pwd}@{host}:3306/movie".format(pwd=config['password'], host=config['host'])
+    engine = sqlalchemy.create_engine(conn_str, poolclass=QueuePool, pool_pre_ping=True)
+    return engine
 
+
+def get_connection(engine):
+    connection = engine.connect()
+    return connection
 
 
 def init_db():
@@ -29,175 +45,6 @@ def get_cursor(connection, opt=False):
             print('connection failed')
 
     return connection.cursor(buffered=True, dictionary=dic_option)
-
-
-# id_type : 'eye_id' or 'imdb_id'
-# input: 'SAMTLP1893', 'eye_id'
-# output: 1
-def search_person_id(eye_id, id_type):
-    sql = ("SELECT person_id FROM movie.star WHERE {} = %s;".format( id_type) )
-    connection = init_db()
-    cursor = get_cursor(connection)
-    cursor.execute(sql, (eye_id,))
-    connection.commit()
-    result_list = cursor.fetchall()  # [(1,)]
-    person_id = result_list[0][0]
-    return person_id
-
-def all_zh_data_from_db():
-    # create table
-    connection = init_db()
-    cursor = get_cursor(connection, opt=True)
-    sql = "SELECT merge_id, en_title, zh_title, image,release_date FROM movie.main_info"
-    cursor.execute(sql)
-    out = cursor.fetchall()
-    if out != []:
-        main = out
-        connection.commit()
-        # print(main)
-        return main
-    else:
-        return None
-# all_zh_data_from_db()
-
-def filter_zh_data_from_db(year_min, year_max):
-    # create table
-    connection = init_db()
-    cursor = get_cursor(connection,opt=True)
-    year_sql = "WHERE (release_date BETWEEN {min} AND {max});".format(min=year_min, max=year_max)
-    sql = "SELECT merge_id, en_title, zh_title, image,release_date FROM movie.main_info " + year_sql
-    # SELECT merge_id, en_title, zh_title, image,release_date FROM movie.main_info WHERE (release_date BETWEEN 2022 AND 2025);
-
-    cursor.execute(sql)
-    out = cursor.fetchall()
-    if out != []:
-        main = out
-        connection.commit()
-        # print(main)
-        return main
-    else:
-        return None
-# filter_zh_data_from_db(2022,2025)
-
-def zh_data_from_db(merge_id):
-    # create table
-    connection = init_db()
-    cursor = get_cursor(connection, opt=True)
-    sql = """SELECT 
-                main_info.merge_id, 
-                eye_id, 
-                en_title, 
-                zh_title, 
-                runtime, 
-                release_date, 
-                video, image, 
-                imdb_score, 
-                imdb_count,
-                tomato_meter,
-                tomato_audience,
-                tomato_review_count,
-                tomato_audience_count,
-                meta_score,
-                meta_score_count,
-                meta_user_score,
-                meta_user_count,
-                yahoo_count,
-                yahoo_score
-                FROM movie.rating INNER JOIN movie.main_info ON movie.main_info.merge_id = movie.rating.merge_id where main_info.merge_id = %s;"""
-    cursor.execute(sql, (merge_id,))
-    out = cursor.fetchall()
-    if out != []:
-        main = out[0]
-        connection.commit()
-        # print(main)
-        return main
-    else:
-        return None
-# zh_data_from_db()
-
-def movie_page_data(merge_id):
-    connection = init_db()
-    cursor = get_cursor(connection, opt=True)
-    sql = """SELECT *
-                FROM movie.rating 
-                LEFT JOIN movie.main_info ON movie.main_info.merge_id = movie.rating.merge_id
-                LEFT JOIN movie.cast ON cast.merge_id = main_info.merge_id
-                LEFT JOIN movie.star ON cast.person_id = star.person_id
-                where main_info.merge_id = %s;"""
-    cursor.execute(sql, (merge_id,))
-    row_list = cursor.fetchall()
-    connection.commit()
-
-    # movie main info
-    general = row_list[0].copy()
-    for k in ['text', 'person_id', 'zh_name', 'type', 'en_name']:
-        general.pop(k, None)
-    # print(general)
-    # movie cast
-    cast_dict = {}
-
-    for staff in row_list:
-        type = staff['type']
-        name = staff['zh_name']
-        # print('staff', staff)
-        if type =='dir':
-            if cast_dict.get('dir', None) != None:
-                cast_dict['dir'].append(name)
-            else:
-                cast_dict['dir']= [name]
-
-        if type =='star':
-            if cast_dict.get('star', None) != None:
-                cast_dict['star'].append(name)
-            else:
-                cast_dict['star'] = [name]
-
-        if type =='wrtr':
-            if cast_dict.get('wrtr', None) != None:
-                cast_dict['wrtr'].append(name)
-            else:
-                cast_dict['wrtr'] = [name]
-
-    return general, cast_dict
-
-# movie_page_data('tt1745960')
-
-# output: {'dir': ['喬瑟夫柯辛斯基'], 'star': ['湯姆克魯斯', '麥爾斯泰勒', '方基墨', '珍妮佛康納莉', '喬漢姆', '路易斯普曼', '格蘭鮑威爾', '摩妮卡巴巴羅']}
-def zh_cast_from_db(merge_id):
-    connection = init_db()
-    cursor = get_cursor(connection, opt=True)
-    sql = "SELECT type, zh_name FROM movie.star INNER JOIN movie.cast ON movie.cast.person_id = movie.star.person_id where merge_id = %s;"
-    cursor.execute(sql, (merge_id,))
-    cast = cursor.fetchall()
-    connection.commit()
-
-    cast_dict = {}
-
-    for staff in cast:
-        type = staff['type']
-        name = staff['zh_name']
-        # print('staff', staff)
-        if type =='dir':
-            if cast_dict.get('dir', None) != None:
-                cast_dict['dir'].append(name)
-            else:
-                cast_dict['dir']= [name]
-
-        if type =='star':
-            if cast_dict.get('star', None) != None:
-                cast_dict['star'].append(name)
-            else:
-                cast_dict['star'] = [name]
-
-        if type =='wrtr':
-            if cast_dict.get('wrtr', None) != None:
-                cast_dict['wrtr'].append(name)
-            else:
-                cast_dict['wrtr'] = [name]
-
-    # print('cast_dict', cast_dict)
-    return cast_dict
-# zh_cast_from_db('tt1745960')
 
 
 def rating_from_db(merge_id):
@@ -228,242 +75,239 @@ def rating_from_db(merge_id):
                 'yahoo_count': 0
                 }
 
-# rating_from_db('tt1745960')
+# return 0 if insert data empty
+def insert_dict_into_sql(connection, table_name, my_dict, ignore=None):
+    if my_dict == {}:
+        print('insert dict is empty')
+        return 0
+    # get table column names
+    query_0 = "SHOW COLUMNS FROM {table}".format(table=table_name)
+    table_info = connection.execute(query_0).fetchall()  # ('time', 'float', 'YES', '', None, ''),....]
+    columns = {i[0] for i in table_info}
 
-def create_tb_main_info():
-    # Create DB movie
-    connection = init_db()
-    cursor = get_cursor(connection)
-    cursor.execute("CREATE DATABASE IF NOT EXISTS movie")
-    connection.commit()
+    # check my_dict's keys are all in columns
+    safe_dict = {key: val for key, val in my_dict.items() if key in columns}
 
-    # Create table movie.main_info
-    cursor = get_cursor(connection)
-    cursor.execute("CREATE TABLE IF NOT EXISTS main_info ("
-                   "`merge_id` varchar(255) PRIMARY KEY,"
-                  "`imdb_id` varchar(255),"
-                   "`eye_id` char(20),"
-                   "`en_title` varchar(255),"
-                   "`zh_title` varchar(255),"
-                   "`runtime` int,"
-                   "`release_date` char(12),"
-                   "`video` varchar(255),"
-                   "`image` varchar(255),"
-                   "`text` MEDIUMTEXT)"
-                   )
-    connection.commit()
-    # Create table star
-    cursor = get_cursor(connection)
-    # eye_id, zh_name, imdb_id, en_name
-    cursor.execute("CREATE TABLE IF NOT EXISTS star ("
-                   "`person_id` int AUTO_INCREMENT PRIMARY KEY,"
-                   "`eye_id` varchar(15) UNIQUE,"
-                   "`zh_name` varchar(255),"
-                   "`imdb_id` int unsigned UNIQUE,"
-                   "`en_name` varchar(255))"
-                   )
-    connection.commit()
+    # insert dict into table
+    if ignore == True:
+        ignore_option = ' IGNORE '
+    else:
+        ignore_option = ''
 
-    # Create table movie.cast
-    cursor = get_cursor(connection)
-    # merge_id, type, person_id
-    cursor.execute("CREATE TABLE IF NOT EXISTS cast ("
-                   "`merge_id`varchar(255),"
-                   "`type` CHAR(4),"
-                   "`person_id` int UNIQUE NOT NULL)",
-                   "UNIQUE KEY `cast_index`(`movie_id`,'type', `person_id`) )"
-                   )
-    connection.commit()
+    query_1 = "INSERT {ignore_option} INTO {table} ({columns}) VALUES ({value_placeholders})".format(
+        ignore_option=ignore_option,
+        table=table_name,
+        columns=", ".join(safe_dict.keys()),
+        value_placeholders=str('%s, ' * len(safe_dict)).rstrip(' ,')
+    )
 
-# insert zh_open_eye_data into table main_info & zh_star % cast
-def write_main_info(dict):
-    connection = init_db()
-    cursor = get_cursor(connection)
-
-    # Extract value from input
-    row = dict
-    merge_id = row['merge_id']
-    imdb_id = row['imdb_id']
-    eye_id = row['eye_id']
-    en_title = row['en_title']
-    zh_title = row['zh_title']
-    runtime = row['runtime']
-    release_date = row['release_date']
-    video = row['video']
-    image = row['image_url']
-    text = row['text']
-    director = row.get('director', None)
-    writer = row.get('writer', None)
-    stars = row['star_dict']  # [('GR0071597', '高山南'), ('004000479', '山口勝平'), ('PI0071596', '山崎和佳奈'), ('XA0093172', '小山力也')]
-
-    star_id_list = [tuple[0] for tuple in stars]  # ['GR0071597', '004000479', 'PI0071596', 'XA0093172']
-
-    # Inser stars into DB table star
-    stars_tuples = []  # for star table
-    cast_tuples = []  # for cast table
-    movie_id = merge_id
-
-    if director != None:
-        stars_tuples.append(director)
-    if writer != None:
-        stars_tuples.append(writer)
-    if stars != []:
-        stars_tuples = stars_tuples + stars
-
-    cursor = get_cursor(connection)
-    sql = "INSERT IGNORE INTO star (eye_id, zh_name) VALUES (%s, %s)"
-    cursor.executemany(sql, stars_tuples)
-    connection.commit()
-
-    # Inser star & director % writer into movie.cast
-    # ABRV : director-> dir, writer-> wrtr
-    star_cast_tuples = []
-    if director != None:
-        director_person_id = search_person_id(director[0], 'eye_id')
-        director_tuple = (movie_id, 'dir', director_person_id)
-        cast_tuples.append(director_tuple)
-    if writer != None:
-        writer_person_id = search_person_id(writer[0], 'eye_id')
-        writer_tuple = (movie_id, 'wrtr', writer_person_id)
-        cast_tuples.append(writer_tuple)
-    if stars != []:
-        # stars : [('CE0026830', '克里斯伊凡'), ('UZ0089426', '琪琪帕瑪'),..]
-        for star in stars:
-            star_id = star[0]
-            star_person_id = search_person_id(star_id, 'eye_id')
-            star_tuple = (merge_id, 'star', star_person_id)
-            star_cast_tuples.append(star_tuple)
-
-        cast_tuples = cast_tuples + star_cast_tuples
-
-    cursor = get_cursor(connection)
-    sql = "INSERT IGNORE INTO cast (merge_id, type, person_id) VALUES (%s, %s, %s)"
-    cursor.executemany(sql, cast_tuples)
-    connection.commit()
-
-    # Inser movie data into DB table main_info
-    cursor = get_cursor(connection)
-    tuple = (merge_id, imdb_id, eye_id, zh_title, en_title,  runtime, release_date, image, video, text)
-    sql = "INSERT IGNORE INTO main_info(merge_id, imdb_id, eye_id, zh_title, en_title,  runtime, release_date, image, video, text) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-    cursor.execute(sql, tuple)
-    connection.commit()
-    return
+    # close connection & engine
+    connection.execute(query_1, list(safe_dict.values()))
+    # connection.close()
+    print('write SQL table "{table}" SAVED'.format(table=table_name))
 
 
 
-def write_search_by_eye_result(tuple):
-    # create table
-    connection = init_db()
-    cursor = get_cursor(connection)
-    cursor.execute(
-        "CREATE TABLE IF NOT EXISTS movie.search_by_eye_result ("
-        "`search_word` varchar(255),"
-        "`eye_id` varchar(20) PRIMARY KEY,"
-        "`year` int,"
-        "`imdb_id` varchar(20),"
-        "`zh_name` varchar(255),"
-        "`en_name` varchar(255),"
-        "`scrape` int)"
-                   )
-    connection.commit()
+#dict_list = [{'imdb_id': 'tt1745960', 'lang_type': 'tw', 'name': '捍衛戰士：獨行俠'}, ...]
+# return 0 if insert data empty
+def insert_dict_list_into_sql(connection, table_name, dict_list, ignore=None):
+    if dict_list == []:
+        print('insert list is empty')
+        return 0
 
-    # keyword, eye_id,   zh_name, en_name, imdb_id, year
-    cursor = get_cursor(connection)
+    # get table column names
+    query_0 = "SHOW COLUMNS FROM {table}".format(table=table_name)
+    table_info = connection.execute(query_0).fetchall()
+    columns = {i[0] for i in table_info}
 
-    print(' before insert tuple', tuple)
-    sql = "INSERT IGNORE INTO search_by_eye_result (search_word, eye_id, zh_name, en_name, imdb_id, year) VALUES (%s,%s,%s,%s,%s,%s)"
-    cursor.execute(sql, tuple)
-    connection.commit()
+    # check my_dict's keys are all in columns
+    safe_dict = {key: val for key, val in dict_list[0].items() if key in columns}
+    # insert dict into table
 
-    #  note imdb_id had be scraped
+    if ignore == True:
+        ignore_option = ' IGNORE '
+    else:
+        ignore_option = ''
 
-    imdb_id = tuple[4]
-    connection = init_db()
-    cursor = get_cursor(connection)
-    sql = "UPDATE movie.imdb_movie_id SET scrape = %s WHERE imdb_id = %s;"
-    cursor.execute(sql, (1, imdb_id))
-    connection.commit()
-    print('imdb_id', imdb_id, 'record scrape', '(write_search_by_eye_result)')
-    return
+    query_1 = "INSERT {ignore_option} INTO {table} ({columns}) VALUES ({value_placeholders})".format(
+        ignore_option=ignore_option,
+        table=table_name,
+        columns=", ".join(safe_dict.keys()),
+        value_placeholders=str('%s, ' * len(safe_dict)).rstrip(' ,')
+    )
+    # close connection & engine
+    connection.execute(query_1, list((i.values()) for i in dict_list))
+    # connection.close()
+    print('write SQL table "{table}" SAVED'.format(table=table_name))
 
 
-# write_search_by_eye_result( ('Shut In', 'fEatm0884089', '大開眼戒', 'Eyes Wide Shut', 'tt0120663', '1999') )
+# input: 'movie_info', {'imdb_id': 'tt0000001', 'published':'1894-03-10'}
+# output: INSERT IGNORE INTO movie_info (imdb_id, published) VALUES (%s, %s)
+def convert_dict_to_insert_query(connection, table_name, insert_container):
+    # get table column names
+    query_col = "SHOW COLUMNS FROM {table}".format(table=table_name)
+    table_info = connection.execute(query_col).fetchall()
+    columns = {i[0] for i in table_info}
 
-def write_eye_01(row):
-    connection = init_db()
-    cursor = get_cursor(connection)
-    sql = "INSERT IGNORE INTO eye_01 (id, date, time, imdb_id, word, result_count) VALUES (%s,%s,%s,%s,%s,%s)"
-    cursor.execute(sql, row)
-    connection.commit()
-    # print('write_eye_01 : sql save')
+    # check my_dict's keys are all in columns
+    if type(insert_container) == list and len(insert_container) > 0:
+
+        safe_dict = {key: val for key, val in insert_container[0].items() if key in columns}
+
+    elif type(insert_container) == dict:
+        safe_dict = {key: val for key, val in insert_container.items() if key in columns}
+    else:
+        print('insert_container type error')
+        return None
+
+    query = "INSERT IGNORE INTO {table} ({columns}) VALUES ({value_placeholders})".format(
+        table=table_name,
+        columns=", ".join(safe_dict.keys()),
+        value_placeholders=str('%s, ' * len(safe_dict)).rstrip(' ,')
+    )
+    if type(insert_container) == list:
+        values = list((i.values()) for i in insert_container)
+    elif type(insert_container) == dict:
+        values = [safe_dict.values()]
+    else:
+        print('insert_container type error')
+        return
+    return query, values
+# convert_dict_to_insert_query('movie_info', {'imdb_id': 'tt0000001', 'published':'1894-03-10'})
+
+# input = [ {'table': table, 'value': value}, {'table': table, 'value': value} ]
+# not used
+def insert_multi_table_with_transaction(connection, insert_stuff):
+    with connection.begin():
+        for item in insert_stuff:
+            query, values = convert_dict_to_insert_query(connection, item['table'], item['values'])
+            connection.execute(query, values)
+
+def update_multi_col_by_id(connection, table, dict, id_type, id_str):
+    if dict == {}:
+        return
+    update_col_str = ''
+    for key, val in dict.items():
+        temp = "{field}='{value}',".format(field=key, value=val)
+        update_col_str = update_col_str + temp
+    update_col_str = update_col_str.rstrip(',')
+
+    query = "UPDATE {table} SET {update_str} WHERE {id_type}='{id}';".format(table=table, update_str=update_col_str, id_type=id_type, id=id_str)
+    connection.execute(query)
+
+def update_one_col_by_id(connection, table, dict, id_type, id_str):
+    if dict == {}:
+        return
+    update_col_str = ''
+    value = None
+    for key, val in dict.items():
+        update_col_str = "{field}=%s".format(field=key)
+        value = val
+    query = "UPDATE {table} SET {update_str} WHERE {id_type}='{id}';".format(table=table, update_str=update_col_str, id_type=id_type, id=id_str)
+    connection.execute(query, (value,))
+
+def mark_column(connection, table_name, column_name, status, where_id, id_value):
+    sql = "UPDATE {table} SET {column} = %s WHERE {id} = %s;".format(table=table_name, column=column_name, id=where_id )
+    connection.execute(sql, (status, id_value))
+    # connection.close()
+
+def sql_select_column(table, columns, connection, struct=None, condition=''):
+    # create column_str e.g. genre_id, genre
+    columns_str = ''
+    for idx, col in enumerate(columns):
+        columns_str = columns_str + col + ' ,'
+    columns_str = columns_str.rstrip(' ,')
+    query = "SELECT {columns} FROM {table}".format(table=table, columns=columns_str) + condition + ';'
+    if struct == 'dict':
+        out = connection.execute(query).mappings().fetchall()
+    else:
+        out = connection.execute(query).fetchall()
+
+    if struct == 'list':
+        out = [i[0] for i in out]
+    return out
+
+def get_finshed_log(start, status, result_count):
+    fname = os.path.basename(__file__)
+    func_name = inspect.stack()[0][3]
+    start_date = taiwan_time_converter(start)
+    end = get_current_taiwan_datetime()
+    end_date = get_current_taiwan_time_str()
+    spent = round(timedelta_second_converter(end - start), 2)
+    log = {
+        'file_name': fname,
+        'func_name': func_name,
+        'start': start_date,
+        'end': end_date,
+        'spent': spent,
+        'status_code': status,
+        'result_count': result_count
+    }
+    return log
+
+def save_error_log(connection, start, file_name, func_name, status, imdb_id, msg):
+    end = get_current_taiwan_datetime()
+    current_time = taiwan_time_converter(end)
+    spent = round(timedelta_second_converter(end - start), 2)
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+
+    log = {
+        'file_name': file_name,
+        'func_name': func_name,
+        'log_time': current_time,
+        'imdb_id': imdb_id,
+        'spent': spent,
+        'status_code': status,
+        'exc_type': str(exc_type),
+        'line': str(exc_tb.tb_lineno),
+        'msg': str(msg)
+    }
+    insert_dict_into_sql(connection=connection, table_name='error_log', my_dict=log, ignore=None)
+    return log
+
+def save_processing_log(connection, start, file_name, func_name, status, imdb_id):
+    end = get_current_taiwan_datetime()
+    current_time = taiwan_time_converter(end)
+    spent = round(timedelta_second_converter(end - start), 2)
+    log = {
+        'file_name': file_name,
+        'func_name': func_name,
+        'log_time': current_time,
+        'imdb_id': imdb_id,
+        'spent': spent,
+        'status_code': status,
+    }
+    insert_dict_into_sql(connection=connection, table_name='data_processing_log', my_dict=log, ignore=None)
+    return log
 
 
-def mark_eye_01(status, imdb_id):
-    connection = init_db()
-    cursor = get_cursor(connection)
-    sql = "UPDATE movie.imdb_movie_id SET eye_01 = %s WHERE imdb_id = %s;"
-    cursor.execute(sql, (status , imdb_id))
-    connection.commit()
-    print('imdb_id', imdb_id, 'record eye_01', 'status', status, 'OK')
+def save_processing_finished_log(connection, start, file_name, func_name, finished_num):
+    start_date = taiwan_time_converter(start)
+    end = get_current_taiwan_datetime()
+    end_date = taiwan_time_converter(end)
+    spent = round(timedelta_second_converter(end - start), 2)
+    if finished_num != 0:
+        work_per_s = round(spent/finished_num, 1)
+    else:
+        work_per_s = 0
+    log = {
+        'file_name': file_name,
+        'func_name': func_name,
+        'start': start_date,
+        'end': end_date,
+        'spent': spent,
+        'status_code': 1,
+        'result_count': finished_num,
+        'work_per_s': work_per_s
+    }
+    insert_dict_into_sql(connection=connection, table_name='processing_finished_log', my_dict=log)
+    return log
 
 
-def mark_eye_02(status, eye_id):
-    connection = init_db()
-    cursor = get_cursor(connection)
-    sql = "UPDATE movie.eye_02_id SET scrape = %s WHERE eye_id = %s;"
-    cursor.execute(sql, (status, eye_id))
-    connection.commit()
-    print('eye_id', eye_id, 'record eye_02_id', 'status', status, 'finished')
-
-
-def write_eye_02_id(tuple_list):
-    connection = init_db()
-    cursor = get_cursor(connection)
-    sql = "INSERT IGNORE INTO eye_02_id (mongo_start, mongo_end, eye_id) VALUES (%s,%s,%s)"
-    cursor.executemany(sql, tuple_list)
-    connection.commit()
-    print('write_eye_02_id : SQL SAVE')
-
-def get_eye_id_from_sql(start_date, end_date):
-    # create table
-    connection = init_db()
-    cursor = get_cursor(connection, opt=False)
-    date_range = "WHERE (mongo_end BETWEEN '{min}' AND '{max}');".format(min=start_date, max=end_date)
-    sql = "SELECT eye_id FROM movie.eye_02_id " + date_range
-    cursor.execute(sql)
-    out = cursor.fetchall()
-    eye_id_list = [id[0] for id in out]  # ['A12020090204', 'f1en00326716',...]
-    # print(eye_id_list)
-    return eye_id_list
-
-
-# get_eye_id_from_sql('2022-07-05', '2022-07-05')
-
-def create_eye_01_log():
-    connection = init_db()
-
-    # Create table movie.main_info
-    cursor = get_cursor(connection)
-    cursor.execute("CREATE TABLE IF NOT EXISTS eye_01_log ("
-                   "`log_time`DATE,"
-                   "`imdb_id` varchar(255),"
-                   "`word` varchar(255),"
-                   "`time` float,"
-                   "`status` int,"
-                   "`result_count` int,"
-                   "`msg` varchar(255),"
-                   "UNIQUE(imdb_id, word))"
-                   )
-    connection.commit()
-
-create_eye_01_log()
-
-
-def write_eye_01_log(tuple_list):
-    connection = init_db()
-    cursor = get_cursor(connection)
-    sql = "INSERT IGNORE INTO eye_01_log (log_time, imdb_id, word, time, status, result_count, msg) VALUES (%s,%s,%s,%s,%s,%s,%s)"
-    cursor.executemany(sql, tuple_list)
-    connection.commit()
-    print('write_eye_01_log : SQL SAVE')
-
+def delete_row():
+    engine = create_conn_pool()
+    connection = get_connection(engine)
+    query = 'DELETE FROM `processing_finished_log` WHERE file_name="douban_03.py";'
+    connection.execute(query)
+    connection.close()
+    engine.dispose()
