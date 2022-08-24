@@ -1,41 +1,23 @@
+from pymongo.write_concern import WriteConcern
 from pymongo import MongoClient
 from db_setting import connect_set
-from datetime import datetime
-from pymongo import ASCENDING, DESCENDING,TEXT
+from pymongo import TEXT
 
 mongo = connect_set.mongo.set
 
 mongo_pwd = mongo['password']
-mongo_connection = "mongodb+srv://fuzzy_user:{pwd}@cluster0.n9qoj.mongodb.net/?retryWrites=true&w=majority".format(pwd=mongo_pwd)
-client = MongoClient(mongo_connection)
-db = client.movie
-# mongo_col = db.fuzzy_input_substr
+aws = mongo['aws']
+# mongo_connection = 'mongodb://local:{pwd}@{aws}:27017/movie'.format(pwd=mongo_pwd, aws=aws)
+# client = MongoClient(mongo_connection)
+# db = client.movie
 
+def create_mongo_connection():
+    mongo_conn_str = 'mongodb://local:{pwd}@{aws}:27017/movie'.format(pwd=mongo_pwd, aws=aws)
+    mongo_connection = MongoClient(mongo_conn_str)
+    mongo_db = mongo_connection.movie
+    return mongo_db, mongo_connection
 
-log_path = "mongo.log"
-
-
-
-# SAVE DATA TO MONGO DB eye_01_pages
-def insert_eye_search_result(doc):
-    db.eye_01_pages.insert_one(doc)
-    print('mongo eye_01 insert successfully')
-
-
-def insert_many_eye_search_result(doc_list):
-    print('doc_list', doc_list)
-    print()
-    db.test.insert_many(doc_list)
-    print('mongo test insert Many successfully')
-
-def insert_test(doc):
-    print('doc_list', doc)
-    print()
-    db.test.insert(doc)
-    print('mongo test insert Many successfully')
-
-
-def create_unique_index(index_name):
+def create_unique_index(db, index_name):
     try:
 
         db.eye_01_pages.create_index(
@@ -44,42 +26,47 @@ def create_unique_index(index_name):
         )
     except Exception as er:
         print(er)
+    client.close()
 
 # create_multi_unique_index('imdb_keyword')
 
-def get_mongo_eye_1(start, end):
-    # $gte: greater than or equal to start_date
-    # $lte: less than or equal to end_date
-    mongo_col = db.eye_01_pages
-    eye_1_docs = mongo_col.find({'created_date': {'$gte': start, '$lte': end}})
-    # for i in eye_1_docs:
-    #     print(i)
-
-    return eye_1_docs
-
-# get_mongo_eye_1('2022-07-05', '2022-07-05')
-
-
-def insert_mongo_eye_03_movie_page(doc):
+# ignore duplicate
+def insert_mongo_doc(db, collection_name, doc):
     # SAVE DATA TO MONGO DB
-    func_name = 'insert_eye_03_movie_page'
-    try:
-        db.eye_03_detail.insert_one(doc)
-        print(func_name + '\tmongo insert successfully\n')
-    except:
-        with open(log_path, 'a', encoding='utf-8') as f:
-            current_time = datetime.now().strftime('%Y-%m-%d %H:%M')
-            f.write(current_time + '\t' + func_name + '\tinsert failed\n')
+    collection = db[collection_name]
+    collection.with_options(write_concern=WriteConcern(w=0)).insert_one(doc)
+    print(collection_name + ' mongo insert successfully')
+
+def insert_many_mongo_docs(db, collection_name, doc_list):
+    # SAVE DATA TO MONGO DB
+    collection = db[collection_name]
+    collection.insert_many(doc_list)
+    print(collection_name + ' mongo insert successfully')
 
 
-def get_mongo_eye_03_detail(start, end):
+def get_mongo_doc_by_date(db, start, end, collection_name, douban_id=None):
     # $gte: greater than or equal to start_date
     # $lte: less than or equal to end_date
-    mongo_col = db.eye_03_detail
-    eye_3_docs = mongo_col.find({'created_date': {'$gte': start, '$lte': end}})
-    # for i in eye_3_docs:
-    #     print(i)
-    #     print()
-    return eye_3_docs
+    mongo_col = db[collection_name]
+    find_condition = {'created_date': {'$gte': start, '$lte': end}}
+    if douban_id != None:
+        find_condition.update({'douban_id': douban_id})
 
-# get_mongo_eye_03_detail('2022-07-06', '2022-07-06')
+    docs = mongo_col.find(find_condition)
+    return docs
+
+def get_mongo_doc_by_id(db, collection_name, id_type, id):
+    # $gte: greater than or equal to start_date
+    # $lte: less than or equal to end_date
+    mongo_col = db[collection_name]
+    find_condition = {id_type: id}
+    docs = mongo_col.find(find_condition)
+
+    return docs
+
+def get_mongo_doc(db, collection_name):
+    mongo_col = db[collection_name]
+    docs = mongo_col.find({})
+    return docs
+
+
