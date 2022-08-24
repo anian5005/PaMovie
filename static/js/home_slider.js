@@ -1,5 +1,17 @@
-console.log('home slider JS')
+function get_new_movie() {
+    <!--get min & max-->
+    let showeL = document.querySelector(".slider.year > .left-s");
+    let showeR = document.querySelector(".slider.year > .right-s");
+    year_min = showeL.textContent;
+    year_max = showeR.textContent;
+    console.log('year_min', year_min)
+    console.log('year_max', year_max)
+    update_data_by_slider(year_min, year_max)
+}
+
+
 const range = () => {
+    console.log('range_func');
     var inputLeft = document.getElementById("input-left");
     var inputRight = document.getElementById("input-right");
 
@@ -14,8 +26,8 @@ const range = () => {
         min = parseInt(_this.min),
 
         max = parseInt(_this.max);
-//       console.log( _this.value);
-//          console.log( _this.value);
+       console.log( _this.value);
+
 
       _this.value = Math.min(parseInt(_this.value), parseInt(inputRight.value) - 1);
 
@@ -34,6 +46,7 @@ const range = () => {
       var _this = inputRight,
         min = parseInt(_this.min),
         max = parseInt(_this.max);
+        console.log( _this.value);
 
       _this.value = Math.max(parseInt(_this.value), parseInt(inputLeft.value) + 1);
 
@@ -61,7 +74,8 @@ const range = () => {
     });
     inputLeft.addEventListener("mouseup", function() {
       thumbLeft.classList.remove("active");
-      get_new_movie()
+      console.log('mouseup','min',min,'max',max);
+//      update_data_by_slider(min, max);
     });
 
     inputRight.addEventListener("mouseover", function() {
@@ -76,13 +90,14 @@ const range = () => {
     });
     inputRight.addEventListener("mouseup", function() {
       thumbRight.classList.remove("active");
-      get_new_movie()
+      console.log('mouseup','min',min,'max',max)
+//      update_data_by_slider(min, max);
     });
 };
 
-range();
+//range();
 
-
+//
 //const range_IMDB = () => {
 //    var inputLeft = document.getElementById("input-left_IMDB");
 //    var inputRight = document.getElementById("input-right_IMDB");
@@ -95,7 +110,7 @@ range();
 //
 //    function setLeftValue() {
 //      var _this = inputLeft,
-//        min = parseInt(_this.min),
+//        min = parseInt(_this.min)
 //
 //        max = parseInt(_this.max);
 ////       console.log( _this.value);
@@ -115,7 +130,7 @@ range();
 //
 //    function setRightValue() {
 //      var _this = inputRight,
-//        min = parseInt(_this.min),
+//        min = parseInt(_this.min)
 //        max = parseInt(_this.max);
 //
 //      _this.value = Math.max(parseInt(_this.value), parseInt(inputLeft.value) + 1);

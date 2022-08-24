@@ -14,7 +14,7 @@ function clear_box() {
 
 //home page default movie
 function movie_list(){
-    var dataUrl= "/api/movielist"
+    var dataUrl= "/api/movielist";
     var xhr = new XMLHttpRequest()
     xhr.open('GET',dataUrl, true)
     xhr.send()
@@ -30,7 +30,7 @@ function movie_list(){
     }
 }
 
-movie_list()
+
 
 
 function create_box(data){
@@ -47,7 +47,7 @@ function create_box(data){
             // a_outer
             var merge_id = movie['merge_id'];
             var a_outer = document.createElement('a');
-            var page_url = "/title/" + merge_id
+            var page_url = "/title/" + merge_id;
              a_outer.setAttribute('href', page_url);
              a_outer.setAttribute('target', "_blank");
 
@@ -78,14 +78,15 @@ function create_no_result(){
 }
 
 function update_data_by_slider(year_min, year_max){
-    var dataUrl= "/api/movielist/" + year_min + '/' +year_max
-    var xhr = new XMLHttpRequest()
+    var dataUrl= "/api/movielist/" + year_min + '/' +year_max;
+    var xhr = new XMLHttpRequest();
     xhr.open('GET',dataUrl, true)
     xhr.send()
 
 
     xhr.onload = function(){
         if(xhr.status == 200){
+        console.log('update_data_by_slider','get data')
             console.log('xhr.status', xhr.status);
             var data = JSON.parse(this.responseText);
             clear_box();
@@ -101,7 +102,3 @@ function update_data_by_slider(year_min, year_max){
         }
     }
 }
-
-
-
-

@@ -3,20 +3,24 @@
 <html>
 
     <head>
+
+
         <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='img/pa_logo.ico')}}">
         <meta charset="utf-8">
         <title>Pa Movie</title>
+        <script>console.log('home script');</script>
 
         <link rel="stylesheet"  href="{{url_for('static', filename='css/home_style.css')}}">
         <script src="{{url_for('static', filename='js/home.js')}}"></script>
         <link rel="stylesheet"  href="{{url_for('static', filename='css/home_slider.css')}}">
+
     </head>
     <BODY>
 
         <header>
             <nav>
                 <a href="/">
-                    <img src="{{url_for('static', filename='img/word_logo-removebg-preview.png')}}" width="250px" display="inline" >
+                    <img src="{{url_for('static', filename='img/word_logo-removebg-preview.png')}}" width="250px;" >
                 </a>
 
     <!--                <form method="get" action="https://tw.search.yahoo.com/search" target="_blank" >-->
@@ -26,6 +30,8 @@
     <!--                </form>-->
             </nav>
         </header>
+        <br><br>
+        <script>console.log('home script 2');</script>
         <div class="filter" id="year">
             <div class="filter_container">
                 <h2>Year</h2>
@@ -38,13 +44,14 @@
                             <div class="range" ></div>
                             <div class="thumb left"></div>
                             <div class="thumb right" ></div>
-                            <span class="showe left-s">1</span>
-                            <span class="showe right-s">2</span>
+                            <span class="showe left-s">2000</span>
+                            <span class="showe right-s">2022</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <br><br><br><br>
     <!--        <div class="filter">-->
 
     <!--            <div class="filter_container">-->
@@ -69,21 +76,13 @@
         <div class=article>
             <div class="container" id = "container"></div>
         </div>
-
-        <!--slider-->
-        <script>
-            function get_new_movie() {
-                <!--get min & max-->
-                let showeL = document.querySelector(".slider.year > .left-s");
-                let showeR = document.querySelector(".slider.year > .right-s");
-                year_min = showeL.textContent;
-                year_max = showeR.textContent;
-                console.log('year_min', year_min)
-                console.log('year_max', year_max)
-                update_data_by_slider(year_min, year_max)
-            }
-        </script>
+        <script>update_data_by_slider(2000, 2022);</script>
+        <script>console.log('home script 3');</script>
         <script src="{{url_for('static', filename='js/home_slider.js')}}"></script>
+
+
+
+<script>console.log('home script 4');</script>
 
     </BODY>
 </html>
