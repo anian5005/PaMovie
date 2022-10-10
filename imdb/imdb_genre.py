@@ -1,12 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
-from package.db.sql import insert_dict_list_into_sql, create_conn_pool, get_connection
+from package.db.sql import insert_dict_list_into_db
+from package.db.sql import MySQL
 
 
 # get imdb genre
-def crawler_genre():
-    engine = create_conn_pool()
-    conn = get_connection(engine)
+def scrapying_imdb_genre():
+    sql = MySQL()
+    engine, connection = sql.get_connection()
 
     url = 'https://help.imdb.com/article/contribution/titles/genres/GZDRMS6R742JRGAG#'
     response = requests.get(url)
@@ -19,6 +20,7 @@ def crawler_genre():
     for a_tag in a_list:
         genre = a_tag.text.replace('\n', '').strip().replace(' ', '')
         new_list.append({'genre': genre})
-    insert_dict_list_into_sql(connection=conn, table_name='genre_type',  dict_list=new_list, ignore=None)
+    insert_dict_list_into_db(connection=connection, table_name='genre_type', dict_list=new_list, ignore=None)
 
-# crawler_genre()
+    connection.close()
+    engine.dispose()
