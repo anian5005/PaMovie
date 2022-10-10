@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+    <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='img/pa_logo.ico')}}" >
+    <meta charset="utf-8">
+    <title>Pa Movie</title>
+    <link rel="stylesheet"  href="{{url_for('static', filename='css/style.css')}}">
+    <link rel="stylesheet"  type="text/css" href="{{url_for('static', filename='css/loading-bar.css')}}">
+    <link rel="stylesheet"  type="text/css" href="{{url_for('static', filename='css/loading-bar.min.css')}}">
+
+</head>
+
+<BODY id="body">
+    <header>
+        <div class="nav_outer">
+            <div class="nav_container">
+                <a href="/">
+                <img src="{{url_for('static', filename='img/word_logo-removebg-preview.png')}}" width="250px;" >
+            </a>
+                <script async src="https://cse.google.com/cse.js?cx=3213dc2aaea434259"></script>
+                <div class="gcse-search"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="movie_info">
+        <h1 class="movie_title"> {{ data['片名'] }} {{ data['外文名'] }} </h1>
+        <div class="info_body">
+            <div class="photo">
+                {% if 'img' in data %}
+                    <img id='movie_poster' src= "{{ data['img'] }}" width="200px">
+                {% else %}
+                    <img id='movie_poster' src= "static/img/default.png" width="200px">
+                {% endif %}
+
+            </div>
+            <div id="info_box">
+                <ul>
+                    {% for key in data %}
+                        {% if key == '又名' %}
+                            <li>又名 : </li>
+                            {% for name in data['又名'] %}
+                                <ul>{{ name }}</ul>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if key not in {'rating':'1', 'img': 1, '英文劇情介紹': 1, '中文劇情介紹': 1, '片名': 1, '又名': 1, '工作人員': 1, '外文名': 1} %}
+                        <li>{{ key }} : {{ data[key] }}</li>
+                        {% endif %}
+                    {% endfor %}
+
+                </ul>
+            </div>
+        </div>
+
+        <div class="rating_container">
+        <h1>&nbsp;電影評分</h1>
+                {% if 'imdb_rating' in data['rating'] %}
+                <div class="rating">
+                <img class='rating_icon' src="/static/img/imdb_small_icon.jpg">
+                <p class="rating_value"> {{ data['rating']['imdb_rating'] }}  </p> <p class="gray"> / 10 </p>&nbsp;&nbsp;
+                <p>  {{data['rating']['imdb_votes']}} </p><p class="gray"> 用戶評分 </p>
+                    <p class="gray"> ( {{data['rating']['imdb_updated']}} 更新 )</p>
+                </div>
+                {% endif %}
+
+                {% if 'tomatoes_rating' in data['rating'] %}
+                <div class="rating">
+                    <img class='rating_icon' src="/static/img/tomato_small_icon.jpg">
+                    <p class="rating_value"> {{ data['rating']['tomatoes_rating'] }}  </p> <p class="gray"> / 100 </p>&nbsp;
+                    {% if data['rating']['tomato_votes'] != "unknown" %}
+                        <p>  {{data['rating']['tomato_votes']}} </p><p class="gray"> 用戶評分 </p>
+                    {% endif %}
+                    <p class="gray"> ( {{data['rating']['tomatoes_updated']}} 更新 )</p>
+                </div>
+                {% endif %}
+
+                {% if 'douban_rating' in data['rating'] %}
+                    <div class="rating">
+                    <img class='rating_icon' src="/static/img/douban_icon.jpg">
+                    <p> {{ data['rating']['douban_rating'] }}   </p><p class="gray">/ 10  </p>&nbsp;&nbsp;
+                    <p> {{data['rating']['douban_votes']}} </p><p class="gray"> 用戶評分 </p>
+                    <p class="gray"> ( {{data['rating']['douban_updated']}} 更新 )</p>
+                </div>
+                {% endif %}
+        </div>
+
+        <h1>&nbsp;電影評分轉換「百分比」</h1>
+        <div class="bubble_chart_container">
+            {% if 'imdb_rating' in data['rating'] %}
+                <div class="bubble_chart">
+                    <h4>IMDb</h4>
+                    <div id="imdb_bubble" data-preset="bubble" class="ldBar label-center" data-value="0" data-fill="data:ldbar/res,bubble(#f5c518,#fff,50,1)" style="width:70px;height:70px"></div>
+                </div>
+            {% endif %}
+
+            {% if 'tomatoes_rating' in data['rating'] %}
+                <div class="bubble_chart">
+                    <h4>爛番茄指數</h4>
+                    <div id="tomato_bubble" data-preset="bubble" class="ldBar label-center" data-value="0" data-fill="data:ldbar/res,bubble(#fa320a,#fff,50,1)" style="width:70px;height:70px"></div>
+                </div>
+            {% endif %}
+
+            {% if 'douban_rating' in data['rating'] %}
+                <div class="bubble_chart">
+                    <h4>豆瓣</h4>
+                    <div id="douban_bubble" data-preset="bubble" class="ldBar label-center" data-value="0" data-fill="data:ldbar/res,bubble(#00B51D,#fff,50,1)" style="width:70px;height:70px"></div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="plot">
+        {% for key in data %}
+            {% if key in ['英文劇情介紹', '中文劇情介紹'] %}
+                <h2> {{ key }} </h2>
+                <p> {{ data[key] }}</p>
+            {% endif %}
+        {% endfor %}
+        </div>
+
+        <div class="staff">
+            <h2>工作人員</h2>
+            <ul>
+                {% if '工作人員' in data %}
+                    {% for person_dict in data['工作人員'] %}
+                        {% if person_dict['job_type'] == '導演' %}
+                            <li>{{ person_dict['job_type'] }} : {{ person_dict['en_name'] }}</li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for person_dict in data['工作人員'] %}
+                        {% if person_dict['job_type'] in ['編劇', '剪輯', '攝影', '製片', 'archive footage'] %}
+                            <li>{{ person_dict['job_type'] }} : {{ person_dict['en_name'] }}</li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for person_dict in data['工作人員'] %}
+                        {% if person_dict['job_type'] in ['作曲'] %}
+                            <li>{{ person_dict['job_type'] }} : {{ person_dict['en_name'] }}</li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for person_dict in data['工作人員'] %}
+                        {% if person_dict['job_type'] == '演員' %}
+                            <li>{{ person_dict['job_type'] }} : {{ person_dict['en_name'] }}</li>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+
+<script>
+let data = {{ data|tojson }};
+let imdbRating = data['rating']['imdb_rating'] * 10;
+let doubanRating = data['rating']['douban_rating'] * 10;
+let tomatoesRating = data['rating']['tomatoes_rating'];
+console.log('tomatoesRating', tomatoesRating)
+
+function insertBubbleValue() {
+    if (document.getElementById('imdb_bubble') !== null) {
+        document.getElementById('imdb_bubble').setAttribute("data-value", imdbRating);
+    };
+
+    if (document.getElementById('douban_bubble') !== null) {
+        document.getElementById('douban_bubble').setAttribute("data-value", doubanRating);
+    };
+
+    if (document.getElementById('tomato_bubble') !== null) {
+        document.getElementById('tomato_bubble').setAttribute("data-value", tomatoesRating);
+    };
+}
+insertBubbleValue()
+</script>
+
+
+<script type="text/javascript" src="{{url_for('static', filename='js/loading-bar.min.js')}}"></script>
+</BODY>
+
+
+
+
+
+
+
+
+
+
+

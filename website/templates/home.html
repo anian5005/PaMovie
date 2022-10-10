@@ -1,0 +1,208 @@
+<!DOCTYPE HTML>
+
+<html>
+
+    <head>
+        <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='img/pa_logo.ico')}}">
+        <meta charset="utf-8">
+        <title>Pa Movie</title>
+        <script>console.log('home script');</script>
+
+        <link rel="stylesheet"  href="{{url_for('static', filename='css/home_style.css')}}">
+        <script src="{{url_for('static', filename='js/home.js')}}"></script>
+        <!-- tag filter  -->
+        <link rel="stylesheet"  href="{{url_for('static', filename='css/tag_filter.css')}}">
+
+        <!--slider-->
+        <link rel="stylesheet" href="{{url_for('static', filename='css/slider_style.css')}}">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+    </head>
+
+    <BODY id="body">
+
+        <header>
+            <div class="nav_outer">
+                <div class="nav_container">
+                    <a href="/">
+                        <img src="{{url_for('static', filename='img/word_logo-removebg-preview.png')}}" width="250px;" >
+                    </a>
+                    <script async src="https://cse.google.com/cse.js?cx=3213dc2aaea434259"></script>
+                    <div class="gcse-search"></div>
+                    <form action="/login" method="post">
+                        <input type="password"  name="pwd" placeholder="請輸入密碼">
+                        <label id="Dashboard" class="tooltip">
+                            <span class="tooltiptext"> 訪客密碼: 2022 </span>
+                            <img id="search_icon" src="{{url_for('static', filename='img/circle-question-solid.svg')}}" width="15px;" >
+                        </label>
+                        <input id="DashboardBtn" type="submit" value="Dashboard 訪客登入">
+                    </form>
+
+
+
+
+                </div>
+            </div>
+
+
+            <div class="filter_outer">
+                <div class="filter">
+                    <div class="tag_filter_container">
+                        <div class="filter-content collapse" id="collapse_aside3" style="">
+                            <div class="card-body" id="btns">
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox"  name="genre all"  checked="checked" onclick='tagFilterAllTypeButton()'>
+                                    <span class="btn btn-light"> 全部類型 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value='8' onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 紀錄片 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="4"  onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 動畫 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="6"  onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 喜劇 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="1" onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 動作 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="21" onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 浪漫 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="26" onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 驚悚 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="7"  onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 犯罪 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="15" onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 恐怖 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="3" onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 冒險 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="10" onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 家庭 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="18" onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 懸疑 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="11" onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 奇幻 </span>
+                                </label>
+
+                                <label class="checkbox-btn">
+                                    <input type="checkbox" name="genre name" value="30" onclick='updateMovieByFilter();'>
+                                    <span class="btn btn-light"> 歷史 </span>
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tag_filter_container">
+                        <label><span class="type_name"> 電影年份 </span></label>
+                        <div class="range_slider_container">
+                                    <div class="wrapper" onclick='updateMovieByFilter();'>
+                                        <div class="values">
+                                            <span id="range1">2022</span>
+                                            <span> &dash; </span>
+                                            <span id="range2">2026</span>
+                                </div>
+
+
+                            <div class="slider_inner_container">
+                                <div class="slider-track"></div>
+                                <input type="range" min="2018" max="2030" value="2022" id="slider-1" oninput="slideOne()">
+                                <input type="range" min="2018" max="2030" value="2026" id="slider-2" oninput="slideTwo()">
+                            </div>
+                        </div>
+
+                        <!--Script-->
+                        <script src="{{url_for('static', filename='js/slider_script.js')}}"></script>
+                    </div>
+                    </div>
+
+                    <div class="tag_filter_container">
+
+                        <div class="card-body">
+                            <label><span class="type_name"> 分數排序 </span></label>
+                            <label class="checkbox-btn">
+                                <input type="radio" name="rating" value="popular"  checked="checked" onclick='updateMovieByFilter();'>
+                                <span class="btn btn-light"> 最多人評分 </span>
+                            </label>
+
+                            <label class="checkbox-btn">
+                                <input type="radio" name="rating" value="imdb" onclick='updateMovieByFilter();'>
+                                <span class="btn btn-light"> IMDb </span>
+                            </label>
+
+                            <label class="checkbox-btn">
+                                <input type="radio" name="rating" value="tomato" onclick='updateMovieByFilter();'>
+                                <span class="btn btn-light"> 爛番茄 </span>
+                            </label>
+
+                            <label class="checkbox-btn">
+                                <input type="radio" name="rating" value="douban" onclick='updateMovieByFilter();'>
+                                <span class="btn btn-light"> 豆瓣 </span>
+                            </label>
+
+                        </div>
+
+                </div>
+            </div>
+            </div>
+
+        </header>
+
+        <div class=article>
+            <div class="box_container" id="container"></div>
+        </div>
+        
+
+
+        </div>
+        <div class="card-actions">
+          <button id="load-more" onclick="loadMoreButton()">Load more</button>
+          <span style="color:white">Showing
+            <span id="card-count"> 10</span> of
+            <span id="card-total"></span> movies
+          </span>
+        </div>
+
+        <button onclick="goToTop();" id="goToTopBtn" style="display: block;"> TOP </button>
+
+        <script>
+            console.log('HTML:', 'updateMovieByFilter')
+            updateMovieByFilter(10);
+            tagFilterMutualExclusivity();
+        </script>
+
+    </BODY>
+</html>
+

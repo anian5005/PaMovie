@@ -1,0 +1,139 @@
+<!DOCTYPE HTML>
+
+<html>
+
+    <head>
+        <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='img/pa_logo.ico')}}">
+        <meta charset="utf-8">
+        <title>Data Pipeline Dashboard</title>
+        <script>console.log('dashboard');</script>
+
+        <link rel="stylesheet"  href="{{url_for('static', filename='css/dashboard.css')}}">
+        <script src="https://kit.fontawesome.com/e991b6f00e.js" crossorigin="anonymous"></script>
+
+
+        <header>
+            <div class="nav_outer">
+                <div class="nav_container">
+                    <a href="/">
+                    <img src="{{url_for('static', filename='img/word_logo-removebg-preview.png')}}" width="250px;" >
+                </a>
+                </div>
+            </div>
+        </header>
+
+    </head>
+    <BODY>
+
+
+
+
+
+    <div class="total_header_container">
+        <span class="total_header_title" style="font-size:40px;">當前網頁資料總覽</span>
+        <div class="total_header">
+        <div class="card">
+            <div class="elementor-icon">
+                <i class="fa-solid fa-film fa-3x" ></i>
+            </div>
+            <span id="total_header_data" class="header_num"></span>
+            <span class="header_title">電影檔案總數（2018 年始）</span>
+        </div>
+
+        <div class="card">
+            <div class="elementor-icon">
+                <i class="fa-regular fa-clock fa-3x"></i>
+            </div>
+            <span id="total_header_data_speed" class="header_num"></span>
+            <span class="header_title">近一次電影資料更新速度</span>
+        </div>
+
+        <div class="card">
+            <div class="elementor-icon">
+                <i class="fa-regular fa-image fa-3x"></i>
+            </div>
+            <span id="total_header_img" class="header_num"></span>
+            <span class="header_title">電影圖片總數</span>
+        </div>
+
+        <div class="card">
+            <div class="elementor-icon">
+               <i class="fa-regular fa-star fa-3x"></i>
+            </div>
+            <span id="total_header_rating" class="header_num"></span>
+            <span class="header_title">電影評分總數</span>
+
+        </div>
+
+        <div class="card" id="last_card">
+            <div class="elementor-icon">
+                <i class="fa-regular fa-clock fa-3x"></i>
+            </div>
+            <span id="total_header_rating_speed" class="header_num"></span>
+            <span class="header_title">近一次電影評分更新速度</span>
+
+        </div>
+
+
+    </div>
+    </div>
+
+
+    <div class="row">
+        <div class="table">
+            <h1 class="title">電影資料更新狀況</h1>
+            <table id="movie_data_table">
+                <tr>
+                    <th>日期</th>
+                    <th>IMDb 電影資料</th>
+                    <th>豆瓣電影資料</th>
+                    <th>爛番茄 id 比對</th>
+                </tr>
+            </table>
+        </div>
+        <div id="movieDataSpeed"></div>
+    </div>
+
+
+    <div class="newMovie">
+        <div id='imdbNewMovie'></div>
+        <div id='doubanNewMovie'></div>
+        <div id='tomatoNewMovie'></div>
+    </div>
+    <div class="row">
+        <div id='idFunnelChart'></div>
+        <div id='ConversionRate'></div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="table">
+            <h1>電影評分更新狀況</h1>
+            <table id="movie_rating_table">
+                <tr>
+                    <th>日期 / 錯誤筆數</th>
+                    <th>IMDb </th>
+                    <th>豆瓣電影</th>
+                    <th>爛番茄</th>
+                </tr>
+            </table>
+        </div>
+        <div id="RatingSpeed"></div>
+    </div>
+
+
+    <div id="imdbRatingCount"></div>
+    <div id="tomatoRatingCount"></div>
+    <div id="doubanRatingCount"></div>
+
+
+    <script charset="big5" src='https://cdn.plot.ly/plotly-2.14.0.min.js'></script>
+    <script charset="big5" src="{{url_for('static', filename='js/dashboard.js')}}"></script>
+
+
+
+
+    </BODY>
+</html>
+
