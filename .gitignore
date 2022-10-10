@@ -1,6 +1,6 @@
 .DS_Store
 
-static/img
+website/static/img
 *.log
 trash/old_version/log/
 
@@ -13,3 +13,5 @@ document/
 trash
 document/ssl
 trash/test
+*.vs
+*.txt
