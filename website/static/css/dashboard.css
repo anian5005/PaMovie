@@ -1,0 +1,143 @@
+@charset "UTF-8";
+  header {
+  width:100%;
+
+}
+
+body {
+  height: 100%; margin: 0;
+  font-family: 微軟正黑體, Arial, Helvetica, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background:white;
+}
+
+a {
+background-color:transparent;
+color:white;
+}
+
+a:focus, a:hover, a:link {
+text-decoration:none;
+}
+
+.nav_outer {
+  display: flex;
+  justify-content: center;
+  background: black;
+}
+
+.nav_container {
+  width: 1040px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.total_header_container {
+width: 100%;
+padding: 0px  0px 30px 0px;
+background-color:black;
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+
+
+.total_header {
+width:100%;
+color: white;
+background-color: black;
+display:flex;
+flex-direction: row;
+justify-content:center;
+}
+
+.total_header_title {
+color:white;
+margin-bottom: 60px;
+}
+
+.fa-film , .fa-clock, .fa-star, .fa-image {
+color: white;
+}
+
+h1 {
+color: #3167eb;
+}
+
+.title {
+color: #3167eb;
+}
+
+.card {
+padding: 0px 40px;
+margin: 0px
+background-color: black;
+border-style:solid;
+border-width:0 1px 0 0;
+border-color:#fff;
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+
+#last_card {
+border-width:0;
+}
+
+.header_num {
+color: #5bc0de;
+margin: 20px 0px;
+font-size: 50px;
+font-family:Sans-serif;
+font-weight:bolder;
+}
+
+.header_title {
+font-family:微軟正黑體, Arial, Helvetica, sans-serif;
+font-weight:400;
+font-size:20px;
+}
+
+.newMovie {
+display:flex;
+align-items:center;
+}
+
+.row {
+display:flex;
+}
+
+.table {
+margin-right: 30px;
+height: 500px;
+display:flex;
+align-items:center;
+flex-direction: column;
+}
+
+
+/** dashboard table **/
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  padding: 8px;
+}
+
+th, td {
+text-align: center;
+}
+
+
+tr:nth-child(even) {
+}
+<
