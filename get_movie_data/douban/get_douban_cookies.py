@@ -1,11 +1,17 @@
 import os
+import time
+import inspect
+
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from fake_useragent import UserAgent
 from datetime import datetime, timezone, timedelta
-from package.multi_thread import MultiThread
-from package.db.mongo import insert_mongo_doc, create_mongo_connection
+
+# Local application imports
+from local_package.web_crawler_tools.multi_thread import MultiThread
+from local_package.db.mongodb import insert_mongo_doc, create_mongo_connection
+from local_package.db.mysql import save_error_log
 
 
 file_name = os.path.basename(__file__)
@@ -17,7 +23,7 @@ def get_current_taiwan_datetime():
     return convert_time
 
 
-def get_selenium_cookies():
+def get_selenium_cookies(sql_conn):
     # create driver
     user_agent = UserAgent(use_cache_server=False).random
     options = Options()
@@ -26,8 +32,20 @@ def get_selenium_cookies():
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-    url = 'https://movie.douban.com/subject/10001432/'
-    driver.get(url)
+    url = 'https://movie.douban.com/subject/35914264/'
+
+    try:
+        driver.get(url)
+    except Exception as er:
+        log_info = {
+            'connection': sql_conn,
+            'start': time.time(),
+            'file_name': file_name,
+            'func_name': inspect.stack()[0][3],
+        }
+        save_error_log(status=2, imdb_id='douban_cookies', msg=str(er), log_info=log_info)
+        return 2
+
     cookies = driver.get_cookies()
     cookies_dict = {}
     for item in cookies:
@@ -38,7 +56,7 @@ def get_selenium_cookies():
 
 def save_douban_cookies_mongo_doc(doc_no, sql_conn):
     mongo_db, mongo_conn = create_mongo_connection()
-    my_cookies = get_selenium_cookies()
+    my_cookies = get_selenium_cookies(sql_conn)
     date_ymd = get_current_taiwan_datetime().strftime('%Y-%m-%d')
     # merge data
     data = {
@@ -68,6 +86,3 @@ def save_douban_cookies_into_mongo(target_docs_num, worker_num):
                                                )
     multi_thread_cookies_creator.create_worker()
     mongo_conn.close()
-
-
-

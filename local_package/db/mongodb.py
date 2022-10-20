@@ -1,15 +1,18 @@
+import os
+
+# Third party imports
+from dotenv import load_dotenv
 from pymongo.write_concern import WriteConcern
 from pymongo import MongoClient
-from db_setting import connect_set
 
-mongo = connect_set.mongo.set
+load_dotenv()
+MONGO_AWS = os.getenv('MONGO_AWS')
+MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
 
-mongo_pwd = mongo['password']
-aws = mongo['aws']
 
 
 def create_mongo_connection():
-    mongo_conn_str = 'mongodb://local:{pwd}@{aws}:27017/movie'.format(pwd=mongo_pwd, aws=aws)
+    mongo_conn_str = 'mongodb://local:{pwd}@{aws}:27017/movie'.format(pwd=MONGO_PASSWORD, aws=MONGO_AWS)
     mongo_connection = MongoClient(mongo_conn_str)
     mongo_db = mongo_connection.movie
     return mongo_db, mongo_connection

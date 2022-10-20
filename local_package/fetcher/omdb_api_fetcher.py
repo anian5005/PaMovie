@@ -1,18 +1,25 @@
-from package.db.sql import MySQL
+# Standard library imports
 import requests
 import json
 import time
 import os
-from datetime import date
-from db_setting import connect_set
-from package.multi_thread import MultiThread
 
-omdb_key = connect_set.Omdb.set['key']
+# Third party imports
+from datetime import date
+from dotenv import load_dotenv
+
+# Local application imports
+from local_package.db.mysql import MySQL
+from local_package.web_crawler_tools.multi_thread import MultiThread
+
+load_dotenv()
+OMDB_KEY = os.getenv('OMDB_KEY')
+
 file_name = os.path.basename(__file__)
 
 
 def get_omdb_api_data(imdb_id):
-    url = "http://www.omdbapi.com/?i={}&plot=full".format(imdb_id) + omdb_key
+    url = "http://www.omdbapi.com/?i={}&plot=full".format(imdb_id) + OMDB_KEY
     response = requests.get(url)
     if response.status_code == 200:
         result_json = json.loads(response.text)
@@ -20,7 +27,7 @@ def get_omdb_api_data(imdb_id):
             return {'imdb_id': imdb_id, 'rating': result_json["Ratings"]}
 
     elif response.status_code == 401:  # Request limit reached
-        return 44  # stop worker
+        return 'stop worker'  # stop worker
 
     return None
 

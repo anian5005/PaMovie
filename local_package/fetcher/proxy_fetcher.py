@@ -1,7 +1,13 @@
+# Standard library imports
+import os
 import requests
-from db_setting.connect_set import proxy
 
-proxy_url = proxy.set['url_with_key']
+# Local application imports
+from dotenv import load_dotenv
+
+
+load_dotenv()
+PROXY_URL_WITH_KEY = os.getenv('PROXY_URL_WITH_KEY')
 
 
 def my_address_ip():
@@ -11,7 +17,7 @@ def my_address_ip():
 
 def get_proxy_from_webshare():
     webshare_proxy_list = []
-    api = proxy_url
+    api = PROXY_URL_WITH_KEY
     response = requests.get(api)
     soup_list = str(response.text).split("\r\n")
     for i in soup_list[:100]:

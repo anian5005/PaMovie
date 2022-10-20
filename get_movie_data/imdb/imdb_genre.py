@@ -1,11 +1,12 @@
 import requests
+
 from bs4 import BeautifulSoup
-from package.db.sql import insert_dict_list_into_db
-from package.db.sql import MySQL
+from local_package.db.mysql import insert_dict_list_into_db
+from local_package.db.mysql import MySQL
 
 
 # get imdb genre
-def scrapying_imdb_genre():
+def crawl_imdb_genre():
     sql = MySQL()
     engine, connection = sql.get_connection()
 

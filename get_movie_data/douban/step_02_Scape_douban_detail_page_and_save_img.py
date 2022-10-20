@@ -1,16 +1,19 @@
-from bs4 import BeautifulSoup
 import os
-from datetime import datetime
 import requests
 import inspect
-from package.db.mongo import insert_mongo_doc
-from package.db.s3 import put_photo_to_s3
-from package.db.sql import save_error_log, MySQL, update_on_duplicate_key
-from fake_useragent import UserAgent
 import pymongo.errors
 import time
-from package.multi_thread import DoubaonCookiesCrawler
-from douban.get_douban_cookies import save_douban_cookies_into_mongo
+
+from datetime import datetime
+from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
+
+# Local application imports
+from local_package.db.mongodb import insert_mongo_doc
+from local_package.db.s3 import put_photo_to_s3
+from local_package.db.mysql import save_error_log, MySQL, update_on_duplicate_key
+from local_package.web_crawler_tools.multi_thread import DoubaonCookiesCrawler
+from get_movie_data.douban.get_douban_cookies import save_douban_cookies_into_mongo
 
 file_name = os.path.basename(__file__)
 

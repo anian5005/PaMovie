@@ -1,11 +1,16 @@
 import inspect
 import os
+import time
+
+from time import sleep
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from package.db.sql import save_error_log, MySQL, update_on_duplicate_key
-from package.multi_thread import SeleniumCrawler
-import time
+
+# Local application imports
+from local_package.db.mysql import save_error_log, MySQL, update_on_duplicate_key
+from local_package.web_crawler_tools.multi_thread import SeleniumCrawler
+
 
 file_name = os.path.basename(__file__)
 
@@ -33,21 +38,36 @@ def imdb_mapping_douban_id(imdb_id, sql_conn, driver):
         driver.quit()
         return 2
 
+    # loading page, if failed then try 3 times
+    def refresh(try_num):
+        try:
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, 'footer'))
+            )
+            return True
+
+        except Exception as msg:
+            try_num += 1
+            if try_num < 3:
+                driver.refresh()
+                refresh(try_num)
+                sleep(2)
+            else:
+                msg_text = str(msg) + ' loading element failed after try {} times.'.format(str(try_num))
+                save_error_log(status=2, imdb_id=imdb_id, msg=msg_text, log_info=log_info)
+                driver.quit()
+                return False
+
+    first_try_num = 0
+    loading_element_successfully = refresh(first_try_num)
+
+    if not loading_element_successfully:
+        return 2
+
     # anti-scraping
     if driver.title == '豆瓣 - 登录跳转页':
         driver.quit()
         return 4
-
-    # loading page
-    try:
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, 'sc-gqjmRU'))
-        )
-
-    except Exception as er:
-        save_error_log(status=2, imdb_id=imdb_id, msg=str(er), log_info=log_info)
-        driver.quit()
-        return 2
 
     # find result element
     try:
@@ -71,7 +91,6 @@ def imdb_mapping_douban_id(imdb_id, sql_conn, driver):
         match_result_url = a_tag.get_attribute('href')
         douban_id = get_douban_id(match_result_url)
         douban_row = {'imdb_id': imdb_id, 'douban_id': douban_id}
-        print('douban_row', douban_row)
         update_on_duplicate_key(sql_conn, 'movie_id_mapping', [douban_row], multi_thread=True)
         driver.quit()
         return douban_row

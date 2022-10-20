@@ -1,14 +1,14 @@
 import inspect
 import time
 import os
+
 from datetime import date
-from imdb_mapping_douban_id import multi_thread_imdb_mapping_douban_id, get_imdb_id_list_douban_id_is_null
-from scrapying_douban_detail_page_and_save_img import multi_thread_scrape_douban_detail_page_and_save_img
-from clean_douban_detail_page import multi_thread_clean_douban_02_detail_page_and_save
-from package.db.sql import (
-    update_on_duplicate_key,
-    save_processing_finished_log,
-    MySQL)
+
+# Local application imports
+from get_movie_data.douban.step_01_imdb_mapping_douban_id import multi_thread_imdb_mapping_douban_id, get_imdb_id_list_douban_id_is_null
+from get_movie_data.douban.step_02_Scape_douban_detail_page_and_save_img import multi_thread_scrape_douban_detail_page_and_save_img
+from get_movie_data.douban.step_03_clean_douban_detail_page import multi_thread_clean_douban_detail_page_and_save
+from local_package.db.mysql import update_on_duplicate_key, save_processing_finished_log, MySQL
 
 file_name = os.path.basename(__file__)
 
@@ -37,7 +37,7 @@ def update_new_douban_data():
     multi_thread_scrape_douban_detail_page_and_save_img(crawler_worker_num=25, cookies_worker_num=1,
                                                         target_docs_num=10)
     print('douban 03')
-    multi_thread_clean_douban_02_detail_page_and_save(worker_num=25)
+    multi_thread_clean_douban_detail_page_and_save(worker_num=25)
 
     end = time.time()
 
@@ -77,6 +77,3 @@ def update_new_douban_data():
     update_on_duplicate_key(second_sql_conn, 'dashboard_movie_count', [dashboard_log], True)
 
     engine.dispose()
-
-
-update_new_douban_data()

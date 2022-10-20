@@ -1,15 +1,16 @@
-from package.db.mongo import get_mongo_doc_by_id
-from opencc import OpenCC
-import json
-import re
-from package.db.sql import insert_dict_list_into_db, update_on_duplicate_key
-from package.db.mongo import create_mongo_connection
 import os
 import inspect
-from package.multi_thread import MultiThread
+import json
+import re
 import html
 import time
-from package.db.sql import save_error_log, MySQL
+
+from opencc import OpenCC
+
+# Local application imports
+from local_package.db.mysql import insert_dict_list_into_db, update_on_duplicate_key, save_error_log, MySQL
+from local_package.db.mongodb import get_mongo_doc_by_id, create_mongo_connection
+from local_package.web_crawler_tools.multi_thread import MultiThread
 
 file_name = os.path.basename(__file__)
 
@@ -198,7 +199,7 @@ def get_douban_03_id_list():
     return id_list
 
 
-def multi_thread_clean_douban_02_detail_page_and_save(worker_num):
+def multi_thread_clean_douban_detail_page_and_save(worker_num):
     resource_list = ['sql_conn', 'mongo_conn']
     mongo_db, mongo_conn = create_mongo_connection()
     imdb_id_list = [{'imdb_id': i} for i in get_douban_03_id_list()]

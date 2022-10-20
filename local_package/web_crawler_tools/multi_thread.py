@@ -1,18 +1,22 @@
-from queue import Queue
-import threading
-from package.db.sql import update_on_duplicate_key, save_processing_finished_log
-from package.db.mongo import create_mongo_connection
+# Standard library imports
 import time
-from datetime import date
-from selenium.webdriver.chrome.options import Options
-from fake_useragent import UserAgent
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium import webdriver
-from package.proxy_pool import get_proxy_from_webshare
-from package.db.mongo import get_mongo_doc
+import threading
 import random
-from package.db.sql import MySQL
+
+# Third party imports
 from time import sleep
+from queue import Queue
+from datetime import date
+from fake_useragent import UserAgent
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+
+# Local application imports
+from local_package.fetcher.proxy_fetcher import get_proxy_from_webshare
+from local_package.db.mongodb import get_mongo_doc, create_mongo_connection
+from local_package.db.mysql import MySQL, update_on_duplicate_key, save_processing_finished_log
+
 
 sql = MySQL()
 
@@ -56,7 +60,7 @@ class Worker(threading.Thread):
         if type(return_result) == dict:
             # save dict data, e.g. {'imdb_id': 'tt0013030', 'douban_id': '5078750'}
             self.data_list.append(return_result)
-        elif return_result == 44:
+        elif return_result == 'stop worker':
             self.error_count = 5  # STOP WORKER
         elif type(return_result) == int and return_result > 1:
             self.error_count = self.error_count + 1
@@ -179,15 +183,15 @@ class SeleniumWorker(Worker):
     def run(self):
         ERROR_LIMIT = 5
         while self.job_queue.qsize() > 0 and self.error_count < ERROR_LIMIT and len(self.proxy_list) > 0:
-            sleep(10)
             job_info = self.job_queue.get()
             job_idx = job_info['job_idx']
             input_id = job_info['input_id']
             status_code = self.do_job(job_idx=job_idx, input_id=input_id, tool_box=self.tool_box)
-
+            sleep(10)
             # retry when anti-scraping
             if status_code == 4 or status_code == 5:
                 self.do_job(job_idx=job_idx, input_id=input_id, tool_box=self.tool_box)
+
 
         self.save_data()
         # break loop when finished all job or greater than  ERROR_LIMIT

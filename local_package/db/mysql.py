@@ -1,18 +1,26 @@
+# Standard library imports
+import os
 import sqlalchemy
-from sqlalchemy.pool import QueuePool
-from db_setting import connect_set
 import sys
 import html
 import time
+
+# Third party imports
+from dotenv import load_dotenv
 from datetime import datetime
+from sqlalchemy.pool import QueuePool
+
+
+load_dotenv()
+RDS_DB_PASSWORD = os.getenv('RDS_DB_PASSWORD')
+RDS_DB_HOST = os.getenv('RDS_DB_HOST')
 
 
 class MySQL:
     def __init__(self):
-        config = connect_set.rds.set
         self.conn_config = "mysql+pymysql://local:{pwd}@{host}:3306/movie".format(
-            pwd=config['password'],
-            host=config['host']
+            pwd=RDS_DB_PASSWORD,
+            host=RDS_DB_HOST
         )
 
     def create_conn_pool(self):
@@ -218,7 +226,7 @@ def fetch_movie_detail_dict(movie_id):
     staff_columns = ['movie.staff.job_type', 'movie.celebrity.en_name']
     staff_condition = """ INNER JOIN movie.celebrity
     ON movie.staff.imdb_per = movie.celebrity.imdb_per
-    WHERE imdb_movie = '{}';""".format(movie_id)
+    WHERE imdb_id = '{}';""".format(movie_id)
     staff_dict_list = sql.fetch_data(sql_conn, 'staff', staff_columns, staff_condition, 'dict')
 
     # get other names from db
@@ -440,12 +448,12 @@ def get_dashboard_data():
             imdb_data_update_time_speed.append(0)
 
         if douban_new_count != 0:
-            douban_data_update_time_speed.append(round(douban_data_time / douban_new_count, 2))
+            douban_data_update_time_speed.append(round(douban_data_time / imdb_new_count, 2))
         else:
             douban_data_update_time_speed.append(0)
 
         if rotten_tomatoes_new_count != 0:
-            tomato_id_update_time_speed.append(round(tomato_id_time / rotten_tomatoes_new_count, 2))
+            tomato_id_update_time_speed.append(round(tomato_id_time / imdb_new_count, 2))
         else:
             tomato_id_update_time_speed.append(0)
 
@@ -609,3 +617,47 @@ def get_dashboard_data():
     engine.dispose()
 
     return my_dict
+
+
+def test():
+    sql = MySQL()
+    engine, sql_conn = sql.get_connection()
+
+    # movie data pipeline
+    id_list = sql.fetch_data(sql_conn, 'movie_rating', ['imdb_id', 'imdb_updated'], '', 'dict')
+
+
+    # hash_list = {i: 1 for i in id_list}
+    #
+    # tomato_mapping_list = sql.fetch_data(sql_conn, 'douban_staff', ['imdb_id'], '', 'list')
+    # count = 0
+    # temp = {}
+    # for i in tomato_mapping_list:
+    #     if i not in hash_list:
+    #         count = count + 1
+    #         temp.update({i:1})
+    #         print('count: ', count)
+    data_list = []
+    for i in id_list:
+        if i['imdb_updated'] is not None:
+            if i['imdb_updated'].strftime("%Y-%m-%d, %H:%M:%S"):
+                data_list.append({'imdb_id': i['imdb_id'], 'imdb_updated': '2022-10-17 00:00:00'})
+    # for i in temp:
+    #     condition = "imdb_id='{}'".format(i)
+    #     delete_statement = 'DELETE FROM douban_staff WHERE ' + condition
+    #     sql_conn.execute(delete_statement)
+    update_on_duplicate_key(sql_conn, 'movie_rating', data_list, multi_thread=None)
+
+    engine.dispose()
+
+    # for i in temp:
+        # print(i)
+        # condition = "imdb_id='{}'".format(i)
+        # delete_statement = 'DELETE FROM staff WHERE ' + condition
+        # sql_conn.execute(delete_statement)
+
+    # print(count)
+    # print(len(temp))
+
+
+

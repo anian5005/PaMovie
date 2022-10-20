@@ -1,8 +1,11 @@
-from flask import Flask, render_template, redirect, url_for, send_from_directory
 import re
-from package.db.sql import fetch_movie_detail_dict, get_dashboard_data, MySQL
-from flask import request
 import json
+
+from flask import request
+from flask import Flask, render_template, redirect, url_for, send_from_directory
+
+from local_package.db.mysql import fetch_movie_detail_dict, get_dashboard_data, MySQL
+
 
 app = Flask(__name__)
 
@@ -50,6 +53,7 @@ def movie_filter():
 
     sort_col_mapping = {'imdb': 'imdb_rating', 'douban': 'douban_rating', 'tomato': 'tomatoes_rating', 'popular': 'imdb_votes'}
     request_value = json.loads(request.data)
+    print('request_value', request_value)
     # {'start': '2020', 'end': '2022', 'genres': '["9","8","6","1","21","26","7","15","3","10","18","11","30"]'}
 
     start_year = request_value['start']
@@ -84,23 +88,28 @@ def movie_filter():
 
     columns = ['T4.*', 'start_year', 'movie_rating.imdb_rating', 'movie_rating.tomatoes_rating', 'movie_rating.douban_rating', 'imdb_votes', 'douban_votes']
     result_dict_list = sql.fetch_data(sql_conn, table, columns, '')
+    print('result_dict_list', result_dict_list)
     json_obj_list = []
     for item in result_dict_list[: display_movie_num]:
         # serialize SqlAlchemy result to JSON
         movie_dict = dict(item._mapping)
         if movie_dict['tw_name'] is None:
             movie_dict['tw_name'] = movie_dict['primary_title']
+        # convert decimal to string
+        movie_dict['imdb_rating'] = str(movie_dict['imdb_rating'])
+        movie_dict['douban_rating'] = str(movie_dict['douban_rating'])
         movie_dict.pop('primary_title')
         json_obj_list.append(json.dumps(movie_dict))
     data_dict = {'data': json_obj_list, 'total_num': len(result_dict_list)}
 
     sql_conn.close()
     engine.dispose()
+    print('data_dict', data_dict)
 
     return data_dict
 
 
-@app.route('/api/realtime_data', methods=['POST']) #
+@app.route('/api/realtime_data', methods=['POST'])
 def realtime_data():
     dashboard_data = get_dashboard_data()
     return dashboard_data
@@ -114,6 +123,11 @@ def dashboard():
 
 @app.route('/robots.txt')
 def static_from_root():
+    return send_from_directory(app.static_folder, request.path[1:])
+
+
+@app.route('/sitemap_index.xml')
+def sitemap_from_root():
     return send_from_directory(app.static_folder, request.path[1:])
 
 

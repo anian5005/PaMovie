@@ -4,15 +4,18 @@ import re
 import time
 import os
 import inspect
+import pathlib
+
 from datetime import date
-from package.db.sql import (
+
+# Local application imports
+from local_package.db.mysql import (
     update_on_duplicate_key,
     save_processing_finished_log,
     MySQL)
 
-
 # SAVE_PATH = '/home/ec2-user/airflow_temp/imdb/'
-SAVE_PATH = ''
+SAVE_PATH = pathlib.Path(__file__).parent.absolute()
 file_name = os.path.basename(__file__)
 
 
@@ -20,37 +23,37 @@ def download_imdb_dataset():
     # title.basics.tsv.gz
     url = 'https://datasets.imdbws.com/title.basics.tsv.gz'
     filename = url.split("/")[-1]
-    with open(SAVE_PATH + filename, "wb") as f:
+    with open(SAVE_PATH / filename, "wb") as f:
         r = requests.get(url)
         f.write(r.content)
 
     # title.akas.tsv.gz
     url = 'https://datasets.imdbws.com/title.akas.tsv.gz'
     filename = url.split("/")[-1]
-    with open(SAVE_PATH + filename, "wb") as f:
+    with open(SAVE_PATH / filename, "wb") as f:
         r = requests.get(url)
         f.write(r.content)
 
     # title.principals.tsv.gz
     url = 'https://datasets.imdbws.com/title.principals.tsv.gz'
     filename = url.split("/")[-1]
-    with open(SAVE_PATH + filename, "wb") as f:
+    with open(SAVE_PATH / filename, "wb") as f:
         r = requests.get(url)
         f.write(r.content)
 
     # name.basics.tsv.gz
     url = 'https://datasets.imdbws.com/name.basics.tsv.gz'
     filename = url.split("/")[-1]
-    with open(SAVE_PATH + filename, "wb") as f:
+    with open(SAVE_PATH / filename, "wb") as f:
         r = requests.get(url)
         f.write(r.content)
 
 
 def delete_imdb_dataset():
-    os.unlink(SAVE_PATH + 'title.basics.tsv.gz')
-    os.unlink(SAVE_PATH + 'title.akas.tsv.gz')
-    os.unlink(SAVE_PATH + 'title.principals.tsv.gz')
-    os.unlink(SAVE_PATH + 'name.basics.tsv.gz')
+    os.unlink(SAVE_PATH / 'title.basics.tsv.gz')
+    os.unlink(SAVE_PATH / 'title.akas.tsv.gz')
+    os.unlink(SAVE_PATH / 'title.principals.tsv.gz')
+    os.unlink(SAVE_PATH / 'name.basics.tsv.gz')
 
 
 # title.basics.tsv.gz
@@ -72,7 +75,7 @@ def update_new_imdb_id_and_movie_info(old_imdb_id_list):
     new_movie_id_list = []
 
     new_movie_count = 0
-    with gzip.open(SAVE_PATH + 'title.basics.tsv.gz', "rb") as unzip_file:
+    with gzip.open(SAVE_PATH / 'title.basics.tsv.gz', "rb") as unzip_file:
         next(unzip_file)
         for line in unzip_file:
             content_list = line.decode('utf-8').rstrip('\n').split('\t')
@@ -133,13 +136,17 @@ def save_tw_name_into_movie_info():
     sql = MySQL()
     engine, sql_conn = sql.get_connection()
     # get movie imdb_id list
-    movie_id_list = sql.fetch_data(conn=sql_conn, table='movie_info', columns=['imdb_id'], condition='WHERE tw_name is null', struct='list')
+    movie_id_list = sql.fetch_data(conn=sql_conn,
+                                   table='movie_info',
+                                   columns=['imdb_id'],
+                                   condition='WHERE tw_name is null',
+                                   struct='list')
     movie_id_hash = {movie_id: 1 for movie_id in movie_id_list}
 
     # read unzip file, then convert binary to string
     movie_count = 0
     data_list = []
-    with gzip.open(SAVE_PATH + 'title.akas.tsv.gz', "rb") as unzip_file:
+    with gzip.open(SAVE_PATH / 'title.akas.tsv.gz', "rb") as unzip_file:
         for idx, line in enumerate(unzip_file):
             content_list = line.decode('utf-8').rstrip('\n').split('\t')
 
@@ -171,7 +178,7 @@ def save_celebrity_into_movie_info(staff_person_id_list):
     inserted_imdb_person_id_list = []
     count_movie = 0
 
-    with gzip.open(SAVE_PATH + 'name.basics.tsv.gz', "rb") as unzip_file:
+    with gzip.open(SAVE_PATH / 'name.basics.tsv.gz', "rb") as unzip_file:
         for idx, line in enumerate(unzip_file):
             content_list = line.decode('utf-8').rstrip('\n').split('\t')
             # content_list ['nm0000001', 'Fred Astaire', '1899', '1987', 'soundtrack,actor,miscellaneous', 'tt0050419,tt0031983']
@@ -190,7 +197,7 @@ def save_celebrity_into_movie_info(staff_person_id_list):
         if celebrity_data_list:
             update_on_duplicate_key(sql_conn, 'celebrity', celebrity_data_list, True)
 
-        with open(SAVE_PATH + 'lack_imdb_person_id_in_celebrity.txt', 'a') as f:
+        with open(SAVE_PATH / 'lack_imdb_person_id_in_celebrity.txt', 'a') as f:
             for person_id in staff_person_id_hash:
                 if person_id not in {i: 1 for i in inserted_imdb_person_id_list}:
                     f.write('person_id: ' + person_id + '\n')
@@ -207,9 +214,13 @@ def save_staff_into_movie_info():
     # get movie imdb_id list
     condition = """
     LEFT JOIN  movie.staff 
-    ON movie.movie_info.imdb_id = movie.staff.imdb_movie
+    ON movie.movie_info.imdb_id = movie.staff.imdb_id
     WHERE imdb_per IS NULL AND start_year > 2017;"""
-    staff_is_null_movie_id_list = sql.fetch_data(conn=sql_conn, table='movie_info', columns=['DISTINCT imdb_id'], condition=condition, struct='list')
+    staff_is_null_movie_id_list = sql.fetch_data(conn=sql_conn,
+                                                 table='movie_info',
+                                                 columns=['DISTINCT imdb_id'],
+                                                 condition=condition,
+                                                 struct='list')
     movie_id_hash = {movie_id: 1 for movie_id in staff_is_null_movie_id_list}
     print('staff list len', len(staff_is_null_movie_id_list))
 
@@ -219,7 +230,7 @@ def save_staff_into_movie_info():
     safe_staff_data_list = []  # recheck by func 'save_celebrity_into_movie_info()'
     count_movie = 0
 
-    with gzip.open(SAVE_PATH + 'title.principals.tsv.gz', "rb") as unzip_file:
+    with gzip.open(SAVE_PATH / 'title.principals.tsv.gz', "rb") as unzip_file:
         next(unzip_file)
         for idx, line in enumerate(unzip_file):
             content_list = line.decode('utf-8').rstrip('\n').split('\t')
@@ -233,7 +244,7 @@ def save_staff_into_movie_info():
                     job_type = 'actor'
 
                 staff_dict = {
-                    'imdb_movie': content_list[0],
+                    'imdb_id': content_list[0],
                     'imdb_per': content_list[2],
                     'job_type': job_type
                 }
@@ -268,7 +279,11 @@ def update_new_imdb_data():
     # get existed imdb_id list from database
     min_year = 2017
     condition = 'WHERE start_year > {}'.format(min_year)
-    old_imdb_id_list = sql.fetch_data(conn=sql_conn, table='movie_info', columns=['imdb_id'], struct='list', condition=condition)
+    old_imdb_id_list = sql.fetch_data(conn=sql_conn,
+                                      table='movie_info',
+                                      columns=['imdb_id'],
+                                      struct='list',
+                                      condition=condition)
 
     download_imdb_dataset()
 
@@ -286,7 +301,11 @@ def update_new_imdb_data():
     # recheck result
     sql_conn.close()
     second_sql_conn = engine.connect()  # avoid mysql cache
-    new_imdb_id_list = sql.fetch_data(conn=second_sql_conn, table='movie_info', columns=['imdb_id', 'start_year'], struct='list', condition=condition)
+    new_imdb_id_list = sql.fetch_data(conn=second_sql_conn,
+                                      table='movie_info',
+                                      columns=['imdb_id', 'start_year'],
+                                      struct='list',
+                                      condition=condition)
 
     finished_num = len(new_imdb_id_list) - len(old_imdb_id_list)
 
@@ -316,6 +335,3 @@ def update_new_imdb_data():
     update_on_duplicate_key(second_sql_conn, 'dashboard_movie_count', [dashboard_log], True)
     delete_imdb_dataset()
     engine.dispose()
-
-
-update_new_imdb_data()

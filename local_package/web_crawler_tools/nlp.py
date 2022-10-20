@@ -1,4 +1,7 @@
+# Standard library imports
 import string
+
+# Third party imports
 from difflib import SequenceMatcher
 
 

@@ -1,12 +1,14 @@
-from package.db.sql import insert_dict_list_into_db, MySQL, update_on_duplicate_key
-import requests
-from fake_useragent import UserAgent
-from bs4 import BeautifulSoup
-from package.nlp import match_preprocessing
 import time
 import os
+import requests
+
+from fake_useragent import UserAgent
+from bs4 import BeautifulSoup
 from datetime import date
-from package.multi_thread import MultiThread
+
+from local_package.web_crawler_tools.multi_thread import MultiThread
+from local_package.db.mysql import insert_dict_list_into_db, MySQL, update_on_duplicate_key
+from local_package.web_crawler_tools.nlp import match_preprocessing
 
 file_name = os.path.basename(__file__)
 
@@ -26,9 +28,8 @@ def find_movie_on_tomato(search_name):
     search_api = 'https://www.rottentomatoes.com/search?search='
     search_str = search_name.replace(' ', '%20')
     url = search_api + search_str
-    response = requests.get(url=url, headers=headers, proxies={'https': '182.54.239.250:8267'})
+    response = requests.get(url=url, headers=headers)
     soup = BeautifulSoup(response.text, "html.parser")
-    print('status_code', response.status_code)
     if response.status_code == 200:
         try:
             search_result = soup.find('search-page-result', {'type': 'movie'})
@@ -53,15 +54,17 @@ def find_movie_on_tomato(search_name):
                     'cast': cast
                 })
             return result_list
-        except Exception as er:
-            print(er)
+
+        except:
+            # found nothing
+            return None
     else:
         return None
 
 
 # input: 'top gun', 2022, [...]
 # output: filtered_dict list
-def condition_filter(target_movie_name, target_year, result_list):
+def rotten_tomatoes_movie_condition_filter(target_movie_name, target_year, result_list):
     filtered_list = []
     for candidate in result_list:
         candidate_name = candidate['movie_name']
@@ -83,11 +86,11 @@ def get_imdb_target_info(sql_conn, imdb_id):
     table = "(SELECT imdb_id, primary_title, start_year FROM movie.movie_info  where imdb_id = '{}') as t1".format(imdb_id)
     columns = '*'
     condition = """inner join
-    (SELECT movie.staff.imdb_movie, movie.staff.job_type, movie.celebrity.en_name
+    (SELECT movie.staff.imdb_id, movie.staff.job_type, movie.celebrity.en_name
     FROM movie.staff
     INNER JOIN movie.celebrity
     ON movie.staff.imdb_per = movie.celebrity.imdb_per) as t2
-    on t1.imdb_id = t2.imdb_movie;"""
+    on t1.imdb_id = t2.imdb_id;"""
     result_dict_list = sql.fetch_data(sql_conn, table, columns, condition, 'dict')
 
     if not result_dict_list:
@@ -116,13 +119,12 @@ def imdb_mapping_tomato_id(imdb_id, sql_conn, start_year):
     # STEP 0: get imdb target movie info
     # {'target_movie': 'Top Gun: Maverick', 'year': '2022', 'cast': {'Jennifer Connelly': 1, 'Tom Cruise': 1, 'Val Kilmer': 1, 'Jon Hamm': 1, 'Charles Parnell': 1, 'Jay Ellis': 1, 'Glen Powell': 1, 'Bashir Salahuddin': 1, 'Miles Teller': 1, 'Kara Wang': 1, 'Raymond Lee': 1, 'Manny Jacinto': 1, 'Monica Barbaro': 1, 'Jake Picking': 1, 'Lewis Pullman': 1, 'Danny Ramirez': 1, 'Jack Schumacher': 1, 'Greg Tarzan Davis': 1}}
     target_info = get_imdb_target_info(sql_conn, imdb_id)
-    # print('target_info', target_info)
     if target_info is None:
         my_dict = {
             'imdb_id': imdb_id,
             'result': 4,
         }
-        insert_dict_list_into_db(sql_conn, 'tomato_mapping', [my_dict], ignore=True)
+        insert_dict_list_into_db(sql_conn, 'tomato_mapping_result', [my_dict], ignore=True)
 
         # no rotten_tomatoes_id match
         if start_year < 2022:
@@ -142,7 +144,7 @@ def imdb_mapping_tomato_id(imdb_id, sql_conn, start_year):
             'result': 0,
             'imdb_year': target_info['year'],
         }
-        insert_dict_list_into_db(sql_conn, 'tomato_mapping', [my_dict], ignore=True)
+        insert_dict_list_into_db(sql_conn, 'tomato_mapping_result', [my_dict], ignore=True)
 
         # no rotten_tomatoes_id match
         if start_year < 2021:
@@ -150,7 +152,8 @@ def imdb_mapping_tomato_id(imdb_id, sql_conn, start_year):
         return 1
 
     # STEP 2
-    candidate_list = condition_filter(target_info['target_movie'], target_info['year'], result_list)
+    candidate_list = rotten_tomatoes_movie_condition_filter(target_info['target_movie'], target_info['year'],
+                                                            result_list)
 
     # STEP 3: cast matcher
     final_matching_list = []
@@ -177,7 +180,7 @@ def imdb_mapping_tomato_id(imdb_id, sql_conn, start_year):
         }
         # recheck movie url is not null on rotten tomato search result e.g. 'Comrade Drakulich'
         if tomato_id != '':
-            update_on_duplicate_key(sql_conn, 'tomato_mapping', [my_dict], multi_thread=True)
+            update_on_duplicate_key(sql_conn, 'tomato_mapping_result', [my_dict], multi_thread=True)
             update_on_duplicate_key(sql_conn, 'movie_id_mapping', [{'imdb_id': imdb_id, 'rotten_tomatoes_id': tomato_id}], multi_thread=True)
             return 1
 
@@ -189,7 +192,7 @@ def imdb_mapping_tomato_id(imdb_id, sql_conn, start_year):
         'result': 0,
         'candidate': len(final_matching_list)
     }
-    update_on_duplicate_key(sql_conn, 'tomato_mapping', [my_dict], multi_thread=True)
+    update_on_duplicate_key(sql_conn, 'tomato_mapping_result', [my_dict], multi_thread=True)
 
     # do not find this movie again
     if start_year < 2021:
@@ -235,7 +238,7 @@ def multi_thread_rotten_tomatoes_id(worker_num, year):
                                                worker_num=worker_num,
                                                func=imdb_mapping_tomato_id,
                                                file_name=file_name,
-                                               table='tomato_mapping',
+                                               table='tomato_mapping_result',
                                                resource_list=['sql_conn']
                                                )
     multi_thread_cookies_creator.create_worker()
@@ -255,7 +258,3 @@ def multi_thread_rotten_tomatoes_id(worker_num, year):
     update_on_duplicate_key(sql_conn, 'dashboard_movie_count', [dashboard_log], True)
 
     engine.dispose()
-
-
-multi_thread_rotten_tomatoes_id(worker_num=20, year=2017)
-
