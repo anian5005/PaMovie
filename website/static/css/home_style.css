@@ -1,311 +1,265 @@
 @charset "UTF-8";
-  header {
-  width:100%;
+ header {
+     width:100%;
 }
-
-body {
-  height: 100%; margin: 0;
-  font-family: 微軟正黑體, Arial, Helvetica, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #1f1f1f;
+ body {
+     height: 100%;
+     margin: 0;
+     font-family: 微軟正黑體, Arial, Helvetica, sans-serif;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     background: #1f1f1f;
 }
-
-a {
-background-color:transparent;
-color:white;
+ a {
+     background-color:transparent;
+     color:white;
 }
-
-a:focus, a:hover, a:link {
-text-decoration:none;
+ a:focus, a:hover, a:link {
+     text-decoration:none;
 }
-
-#DashboardBtn {
-height:30px;
-cursor: pointer;
-color:white;
-background: #555C84;
-border-radius: 0.37rem;
-letter-spacing:0.15rem;
-font-weight:600;
+ #DashboardBtn {
+     height:30px;
+     cursor: pointer;
+     color:white;
+     background: #555C84;
+     border-radius: 0.37rem;
+     letter-spacing:0.15rem;
+     font-weight:600;
 }
-
-.nav_outer {
-  display: flex;
-  justify-content: center;
-  background: black;
+ .nav_outer {
+     display: flex;
+     justify-content: center;
+     background: black;
 }
-
-.nav_container {
-  width: 1040px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  gap: 30px;
+ .nav_container {
+     width: 1040px;
+     height: 80px;
+     display: flex;
+     align-items: center;
+     gap: 30px;
 }
-
-#search_icon {
-cursor: pointer;
-position: relative;
-top:2.5px;
-right: 25px;
-
-font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f059";
+ #search_icon {
+     cursor: pointer;
+     position: relative;
+     top:2.5px;
+     right: 25px;
+     font-family: "Font Awesome 5 Free";
+     font-weight: 900;
+     content: "\f059";
 }
-
-
 /** dashboard tip **/
 /* Tooltip text */
-
-.tooltip {
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+ .tooltip {
+     position: relative;
+     display: inline-block;
+     border-bottom: 1px dotted black;
+    /* If you want dots under the hoverable text */
 }
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 120px;
-  background-color: #e3e3e3; /**#5bc0de;**/
-  color: black; /**#fff;**/
-  text-align: center;
-  padding: 5px 0;
-  border-radius: 6px;
-  position: absolute;
-  z-index: 1;
+ .tooltip .tooltiptext {
+     visibility: hidden;
+     width: 120px;
+     background-color: #e3e3e3;
+     color: black;
+     text-align: center;
+     padding: 5px 0;
+     border-radius: 6px;
+     position: absolute;
+     z-index: 1;
 }
-
-#Dashboard:hover .tooltiptext {
-visibility: visible;
+ #Dashboard:hover .tooltiptext {
+     visibility: visible;
 }
-
-
-
-#Dashboard:hover:before .tooltiptext {
-  visibility: visible;
+ #Dashboard:hover:before .tooltiptext {
+     visibility: visible;
 }
-
 /** dashboard tip end**/
-
-
-.filter_outer{
-  display: flex;
-  justify-content: center;
-  margin-bottom:10px;
+ .filter_outer{
+     display: flex;
+     justify-content: center;
+     margin-bottom:10px;
 }
-
-
 /** tag_filter **/
-.tag_filter_container{
-  width: 1040px;
-  height: 50px;
-  margin: 10px;
-  display: flex;
-  flex-wrap: wrap;
+ .tag_filter_container{
+     width: 1040px;
+     height: 50px;
+     margin: 10px;
+     display: flex;
+     flex-wrap: wrap;
 }
-
-ul, .list {
-  list-style:none;
-  clear:both;
-  margin: 20px auto 0;
-  padding:0;
+ ul, .list {
+     list-style:none;
+     clear:both;
+     margin: 20px auto 0;
+     padding:0;
 }
-
-li {
-  margin: 5px 10px;
-  float:left;
+ li {
+     margin: 5px 10px;
+     float:left;
 }
-
-/** **/
-
-.filter {
-  width: 1040px;
-  display: flex;
-  flex-direction:column;
-  margin-top:20px;
+ .filter {
+     width: 1040px;
+     display: flex;
+     flex-direction:column;
+     margin-top:20px;
 }
-
-.box_container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+ .box_container {
+     display: flex;
+     flex-wrap: wrap;
+     gap: 10px;
 }
-.article {
-  width: 1040px;
-  /**height: 335px;**/
-  margin-top:90px;
+ .article {
+     width: 1040px;
+     margin-top:90px;
 }
-
-.box {
-  width: 180px;
-  height: 350px;
-  border-radius:10%;
-  border: 5px;
-  margin-right: 10px;
-  margin-left: 10px;
-  margin-bottom:10px;
-  display:flex;
-  flex-wrap:wrap;
-  background-color:transparent;
+ .box {
+     width: 180px;
+     height: 350px;
+     border-radius:10%;
+     border: 5px;
+     margin-right: 10px;
+     margin-left: 10px;
+     margin-bottom:10px;
+     display:flex;
+     flex-wrap:wrap;
+     background-color:transparent;
 }
-
-h5 {
-font-size: 14px;
-font-weight: 800;
-color: #FFFFFF;
-margin-top:10px;
-margin-bottom:10px;
+ h5 {
+     font-size: 14px;
+     font-weight: 800;
+     color: #FFFFFF;
+     margin-top:10px;
+     margin-bottom:10px;
 }
-
-
-.card {
-  height: 266px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 10px; /* 圓角 */
-  box-shadow: 0 0 20px rgba(51, 70, 80, 0.5); /* 外陰影 */
+ .card {
+     height: 266px;
+     position: relative;
+     overflow: hidden;
+     border-radius: 10px;
+    /* 圓角 */
+     box-shadow: 0 0 20px rgba(51, 70, 80, 0.5);
+    /* 外陰影 */
 }
-
-.card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0) linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.7) 80%); /* 圖片的灰階半透明漸層遮罩 */
-  z-index: 0;
+ .card::before {
+     content: "";
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: rgba(0, 0, 0, 0) linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.7) 80%);
+    /* 圖片的灰階半透明漸層遮罩 */
+     z-index: 0;
 }
-
-a.link {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+ a.link {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     z-index: 1;
 }
-
-.poster {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 3s ease;
-  position: relative;
-  z-index: -1;
+ .poster {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+     transition: transform 3s ease;
+     position: relative;
+     z-index: -1;
 }
-
-.info {
-  position: absolute;
-  width: calc(100% - 40px);
-  bottom: 0;
-  padding: 20px;
-  color: #ffffff;
-  transition: background-color 1.5s ease;
-  display:flex;
-
+ .info {
+     position: absolute;
+     width: calc(100% - 40px);
+     bottom: 0;
+     padding: 20px;
+     color: #ffffff;
+     transition: background-color 1.5s ease;
+     display:flex;
 }
-
-.rating_icon {
-width: 35px;
-height:35px;
-margin-right:10px;
-margin-left:18px;
+ .rating_icon {
+     width: 35px;
+     height:35px;
+     margin-right:10px;
+     margin-left:18px;
 }
-
-
-.text-overflow {
-overflow:hidden;
-text-overflow:ellipsis;
-width:100%;
+ .text-overflow {
+     overflow:hidden;
+     text-overflow:ellipsis;
+     width:100%;
 }
-
 /**hover effect**/
-.detail {
-  max-height: 0;
-  opacity: 0;
-  transition: max-height 1.5s ease, opacity 1s ease;
-  display:flex;
-  flex-direction: column;
-  justify-content:center;
-  align-content: flex-start;
+ .detail {
+     max-height: 0;
+     opacity: 0;
+     transition: max-height 1.5s ease, opacity 1s ease;
+     display:flex;
+     flex-direction: column;
+     justify-content:center;
+     align-content: flex-start;
 }
-
-.rating_row {
-display:flex;
-  flex-direction: row;
-  margin-bottom:8px;
-
+ .rating_row {
+     display:flex;
+     flex-direction: row;
+     margin-bottom:8px;
 }
-
-.card:hover {
-  transform: scale(1.2);
-  z-index:0;
+ .card:hover {
+     transform: scale(1.2);
+     z-index:0;
 }
-
-.card:hover .info {
-  background-color: rgba(0, 0, 0, 0.6);
+ .card:hover .info {
+     background-color: rgba(0, 0, 0, 0.6);
 }
-
-.card:hover .detail {
-height: 266px;
-  max-height: 226px;
-  opacity: 1;
+ .card:hover .detail {
+     height: 266px;
+     max-height: 226px;
+     opacity: 1;
 }
-
 /** load more **/
-#card-container {
-  display: flex;
-  flex-wrap: wrap;
+ #card-container {
+     display: flex;
+     flex-wrap: wrap;
 }
-
-.card:hover {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+ .card:hover {
+     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
-
-.card-actions {
-  margin: 8px;
-  padding: 16px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+ .card-actions {
+     margin: 8px;
+     padding: 16px 0;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
 }
-
-#load-more {
-  width: calc((100% / 3) - 8px);
-  padding: 16px;
-  background-color: white;
-  border: none;
-  cursor: pointer;
-  transition: all 200ms ease-in-out;
-  border-radius: 3px;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15rem;
-  font-weight:600;
+ #load-more {
+     width: calc((100% / 3) - 8px);
+     padding: 16px;
+     background-color: white;
+     border: none;
+     cursor: pointer;
+     transition: all 200ms ease-in-out;
+     border-radius: 3px;
+     font-size: 0.75rem;
+     text-transform: uppercase;
+     letter-spacing: 0.15rem;
+     font-weight:600;
 }
-
-#load-more:not([disabled]):hover {
-  box-shadow: 0 1px 9px rgba(0, 0, 0, 0.2);
+ #load-more:not([disabled]):hover {
+     box-shadow: 0 1px 9px rgba(0, 0, 0, 0.2);
 }
-
-#load-more[disabled] {
-  background-color: #eaeaea !important;
+ #load-more[disabled] {
+     background-color: #eaeaea !important;
 }
-
 /** go to top button **/
-#goToTopBtn {
-color: white;
-padding: 10px 10px;
-cursor:pointer;
-border-radius:0.37rem;
-text-transform:uppercase;
-letter-spacing:0.15rem;
-font-size:15px;
-position:fixed;
-bottom:100px;
-right:80px;
-font-weight:400;
-background: #5bc0de;
+ #goToTopBtn {
+     color: white;
+     padding: 10px 10px;
+     cursor:pointer;
+     border-radius:0.37rem;
+     text-transform:uppercase;
+     letter-spacing:0.15rem;
+     font-size:15px;
+     position:fixed;
+     bottom:100px;
+     right:80px;
+     font-weight:400;
+     background: #5bc0de;
 }
