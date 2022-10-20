@@ -37,7 +37,6 @@ function updateMovieByFilter(displayMovieCount = null) {
         displayMovieCount = 10;
     }
 
-    console.log('home_js: ', 'update_movie_by_filte');
     let markedCheckbox = document.getElementsByName('genre name');
     let genreList = new Array();
     for (let checkbox of markedCheckbox) {
@@ -51,14 +50,12 @@ function updateMovieByFilter(displayMovieCount = null) {
     let endYear = document.getElementById('range2').textContent;
     // sorted by
     let sortOrder = document.querySelector('input[name="rating"]:checked').value;
-    console.log('beginYear', beginYear, 'endYear', endYear, 'genreList', genreList, 'sortOrder', sortOrder);
     // ajax request movie
     sendFilteredValue(beginYear, endYear, genreList, sortOrder, displayMovieCount);
 }
 
 
 function sendFilteredValue(yearMin, yearMax, genreList, sortOrder, displayMovieCount) {
-    console.log('home_js: ', 'sendFilteredValue');
     // send Ajax post to movie/filter api
     let letter = {
         'start': yearMin,
@@ -84,7 +81,6 @@ function sendFilteredValue(yearMin, yearMax, genreList, sortOrder, displayMovieC
                 displayPage(displayMovieCount, totalMovieResult);
             } else {
                 create_no_result();
-                console.log('no data');
             }
         }
     }

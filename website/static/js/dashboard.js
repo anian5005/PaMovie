@@ -1,15 +1,11 @@
 function sendDashboardValue() {
-    console.log('home_js: ', 'sendFilteredValue');
     // send Ajax post to movie/filter api
-    let letter = {
-
-    };
+    let letter = {};
     let xhr = new XMLHttpRequest(); // new HttpRequest instance
     xhr.open("POST", "/api/realtime_data");
     xhr.setRequestHeader("Content-Type", "application/json");
     let data = JSON.stringify(letter)
     xhr.send(data);
-    console.log('send request');
 
     // get server response
     xhr.onload = function() {
@@ -37,7 +33,6 @@ function createTableResult(data) {
     let data_date_list = data['date_list'];
     let dataResultList = data['data_table_result'];
     let ratingResultList = data['rating_table_result'];
-    console.log('rating_table_result', ratingResultList);
 
     for (const row of dataResultList) {
         let tr = document.createElement('tr');

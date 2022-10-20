@@ -10,10 +10,8 @@ function update_data_by_filter() {
 
     let beginYear = document.getElementById('range1').textContent;
     let endYear = document.getElementById('range2').textContent;
-    console.log('beginYear', beginYear, 'endYear', endYear, 'genreList', genreList);
     // ajax request movie
     sendFilteredValue(beginYear, endYear, genreList);
-
 }
 
 
@@ -33,17 +31,12 @@ function sendFilteredValue(yearMin, yearMax, genreList) {
     // get server response
     xhr.onload = function() {
         if (xhr.status == 200) {
-            console.log('xhr.status', xhr.status);
             let data = JSON.parse(this.responseText);
             clear_box();
-            console.log('get data', data);
-            console.log('type', typeof data)
-
             if (data['data'] !== null) {
                 create_box(data);
             } else {
                 create_no_result();
-                console.log('no data');
             }
         }
     }
