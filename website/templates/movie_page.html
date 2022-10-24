@@ -157,7 +157,6 @@ let data = {{ data|tojson }};
 let imdbRating = data['rating']['imdb_rating'] * 10;
 let doubanRating = data['rating']['douban_rating'] * 10;
 let tomatoesRating = data['rating']['tomatoes_rating'];
-console.log('tomatoesRating', tomatoesRating)
 
 function insertBubbleValue() {
     if (document.getElementById('imdb_bubble') !== null) {
