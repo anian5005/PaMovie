@@ -91,6 +91,7 @@ Create a conditional filter to filter the movie list from Rotten Tomatoes web se
 #### Others
 * Version Control: Git & GitHub
 * Scrum: Trello
+* Google Search API
 
 ## Data Source
 * [IMDb](https://www.imdb.com/?ref_=nv_home)
