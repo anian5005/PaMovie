@@ -4,6 +4,7 @@ import sqlalchemy
 import sys
 import html
 import time
+import json
 
 # Third party imports
 from dotenv import load_dotenv
@@ -86,7 +87,6 @@ def insert_dict_list_into_db(connection, table_name, dict_list, ignore=None):
 
     # close connection & engine
     connection.execute(query_1, list((i.values()) for i in safe_dict_list))
-    print('write SQL table "{table}" SAVED'.format(table=table_name))
 
 
 def update_on_duplicate_key(connection, table, data_list, multi_thread=None):
@@ -103,7 +103,6 @@ def update_on_duplicate_key(connection, table, data_list, multi_thread=None):
             row_values = data_dict.values()
             values.append(row_values)
         connection.execute(query, values)
-        print('data updated')
     if multi_thread is None:
         connection.close()
 
@@ -619,45 +618,57 @@ def get_dashboard_data():
     return my_dict
 
 
-def test():
+def home_page_filter(request_value):
+    sort_col_mapping = {'imdb': 'imdb_rating',
+                        'douban': 'douban_rating',
+                        'tomato': 'tomatoes_rating',
+                        'popular': 'imdb_votes'}
+
+    start_year = request_value['start']
+    end_year = request_value['end']
+    display_movie_num = request_value['num']
+    sort_value = request_value['sortOrder']
+    sort_col_name = sort_col_mapping[sort_value]
+    if request_value['genres'] == '[]':
+        genres = tuple(range(1, 30))  # all genres
+    else:
+        genres = tuple(request_value['genres'])  # selected genre type
+
     sql = MySQL()
     engine, sql_conn = sql.get_connection()
+    table = """(SELECT distinct start_year, imdb_id, primary_title, tw_name, img  FROM
+        (SELECT start_year, T2.imdb_id, T2.primary_title, T2.tw_name, T2.img, T2.genre_id FROM
+        (SELECT T1.*, movie_genre.genre_id FROM (SELECT start_year, imdb_id, primary_title, tw_name, img FROM movie.movie_info
+        WHERE start_year BETWEEN {} AND {} AND img is not null) AS T1
+        INNER JOIN movie.movie_genre
+        ON movie.movie_genre.imdb_id = T1.imdb_id) AS T2
+        INNER JOIN movie.genre_type
+        ON T2.genre_id = movie.genre_type.genre_id
+        WHERE genre_type.genre_id IN {}
+        ) as T3) as T4
+        INNER JOIN movie.movie_rating
+        ON T4.imdb_id = movie_rating.imdb_id
+        ORDER BY {} DESC
+        """.format(start_year, end_year, genres, sort_col_name)
+    columns = ['T4.*', 'start_year', 'movie_rating.imdb_rating', 'movie_rating.tomatoes_rating',
+               'movie_rating.douban_rating', 'imdb_votes', 'douban_votes']
+    result_dict_list = sql.fetch_data(sql_conn, table, columns, '')
+    json_obj_list = []
+    for item in result_dict_list[: display_movie_num]:
+        # serialize SqlAlchemy result to JSON
+        movie_dict = dict(item._mapping)
+        if movie_dict['tw_name'] is None:
+            movie_dict['tw_name'] = movie_dict['primary_title']
+        # convert decimal to string
+        movie_dict['imdb_rating'] = str(movie_dict['imdb_rating'])
+        movie_dict['douban_rating'] = str(movie_dict['douban_rating'])
+        movie_dict.pop('primary_title')
+        json_obj_list.append(json.dumps(movie_dict))
+    data_dict = {'data': json_obj_list, 'total_num': len(result_dict_list)}
 
-    # movie data pipeline
-    id_list = sql.fetch_data(sql_conn, 'movie_rating', ['imdb_id', 'imdb_updated'], '', 'dict')
-
-
-    # hash_list = {i: 1 for i in id_list}
-    #
-    # tomato_mapping_list = sql.fetch_data(sql_conn, 'douban_staff', ['imdb_id'], '', 'list')
-    # count = 0
-    # temp = {}
-    # for i in tomato_mapping_list:
-    #     if i not in hash_list:
-    #         count = count + 1
-    #         temp.update({i:1})
-    #         print('count: ', count)
-    data_list = []
-    for i in id_list:
-        if i['imdb_updated'] is not None:
-            if i['imdb_updated'].strftime("%Y-%m-%d, %H:%M:%S"):
-                data_list.append({'imdb_id': i['imdb_id'], 'imdb_updated': '2022-10-17 00:00:00'})
-    # for i in temp:
-    #     condition = "imdb_id='{}'".format(i)
-    #     delete_statement = 'DELETE FROM douban_staff WHERE ' + condition
-    #     sql_conn.execute(delete_statement)
-    update_on_duplicate_key(sql_conn, 'movie_rating', data_list, multi_thread=None)
-
+    sql_conn.close()
     engine.dispose()
-
-    # for i in temp:
-        # print(i)
-        # condition = "imdb_id='{}'".format(i)
-        # delete_statement = 'DELETE FROM staff WHERE ' + condition
-        # sql_conn.execute(delete_statement)
-
-    # print(count)
-    # print(len(temp))
+    return data_dict
 
 
 

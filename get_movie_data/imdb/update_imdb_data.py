@@ -222,7 +222,6 @@ def save_staff_into_movie_info():
                                                  condition=condition,
                                                  struct='list')
     movie_id_hash = {movie_id: 1 for movie_id in staff_is_null_movie_id_list}
-    print('staff list len', len(staff_is_null_movie_id_list))
 
     # read unzip file, then convert binary to string
     staff_data_list = []

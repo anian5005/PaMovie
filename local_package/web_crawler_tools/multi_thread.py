@@ -52,10 +52,7 @@ class Worker(threading.Thread):
         # break loop when finished all job or greater than  ERROR_LIMIT
 
     def do_job(self, job_idx, input_id, tool_box):
-        print(f"worker {self.worker_no} start job {job_idx}\n")
         return_result = self.job_function(**input_id, **tool_box)
-
-        print(f"worker {self.worker_no} finish job {job_idx}\n")
 
         if type(return_result) == dict:
             # save dict data, e.g. {'imdb_id': 'tt0013030', 'douban_id': '5078750'}
@@ -200,7 +197,6 @@ class SeleniumWorker(Worker):
         # create a driver, then add into tool_box
         self.tool_box_add_create_driver()
 
-        print(f"worker {self.worker_no} start job {job_idx}\n")
         return_result = self.job_function(input_id, **tool_box)
 
         # status_code: 1: successful, 2: error, 4: ip blocked, 5: retry
@@ -215,14 +211,10 @@ class SeleniumWorker(Worker):
             self.proxy_list.append(self.proxy)
             self.proxy = self.proxy_list.pop()
             # save dict data, e.g. {'imdb_id': 'tt0013030', 'douban_id': '5078750'}
-
-            print(f"worker {self.worker_no} finish job {job_idx}\n")
-
             return return_result  # status code: 1, 2, 5 or data dict
 
         elif return_result == 4:
             # anti-scraping, abandon the blocked proxy, then get new one
-            print(self.proxy, 'this proxy was blocked')
             self.proxy = self.proxy_list.pop()
             return 4
 
@@ -258,7 +250,6 @@ class SeleniumCrawler(MultiThread):
         # all job finished
         self.save_finished_log(start)
         self.close_resource()
-        print('proxy can use num', len(self.proxy_list))
 
 
 class DoubaonWorker(Worker):
@@ -290,7 +281,6 @@ class DoubaonWorker(Worker):
             if status_code == 4 or status_code == 5:
                 self.do_job(job_idx=job_idx, input_id=input_id, tool_box=self.tool_box)
 
-        print('break loop')
         # save the last data
         self.save_data()
         # break loop when finished all job or greater than  ERROR_LIMIT
@@ -300,7 +290,6 @@ class DoubaonWorker(Worker):
         self.add_douban_cookies_into_toolbox()
         self.add_proxy_into_toolbox()
 
-        print(f"worker {self.worker_no} start job {job_idx}\n")
         return_result = self.job_function(**input_id, **tool_box)
 
         # status_code: 1: successful, 2: error, 4: ip blocked
@@ -310,7 +299,6 @@ class DoubaonWorker(Worker):
             self.proxy = self.proxy_list.pop()
         elif return_result == 4:
             # anti-scraping, abandon the blocked proxy, then get new one
-            print(self.proxy, 'this proxy was blocked')
             try:
                 self.proxy = self.proxy_list.pop()
                 return 4
@@ -321,7 +309,6 @@ class DoubaonWorker(Worker):
         if type(return_result) == dict:
             # save dict data, e.g. {'imdb_id': 'tt0013030', 'douban_id': '5078750'}
             self.data_list.append(return_result)
-            print(f"worker {self.worker_no} finish job {job_idx}\n")
 
         elif return_result == 2:
             self.error_count = self.error_count + 1

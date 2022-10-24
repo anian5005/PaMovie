@@ -31,12 +31,9 @@ def update_new_douban_data():
 
     old_douban_id_total_count = douban_id_total_count(sql_conn)
 
-    print('douban 01')
     multi_thread_imdb_mapping_douban_id(worker_num=10)
-    print('douban 02')
     multi_thread_scrape_douban_detail_page_and_save_img(crawler_worker_num=25, cookies_worker_num=1,
                                                         target_docs_num=10)
-    print('douban 03')
     multi_thread_clean_douban_detail_page_and_save(worker_num=25)
 
     end = time.time()
