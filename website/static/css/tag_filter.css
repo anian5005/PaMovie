@@ -1,0 +1,63 @@
+ .card-body {
+     width: 1000px;
+}
+ .checkbox-btn {
+     position: relative;
+     margin-right:5px;
+}
+ .checkbox-btn input {
+     position: absolute;
+     z-index: -1;
+     opacity: 0;
+}
+ .checkbox-btn input:checked ~ .btn {
+     border-color: #3167eb;
+     background-color: #3167eb;
+     color: #fff;
+}
+ .btn-light ,.type_name {
+     display: inline-block;
+     font-weight: 600;
+     color: #343a40;
+     text-align: center;
+     vertical-align: middle;
+     -webkit-user-select: none;
+     -moz-user-select: none;
+     -ms-user-select: none;
+     user-select: none;
+     background-color: #eee;
+     border: 1px solid #eee;
+     padding: 0.45rem 0.85rem;
+     font-size: 14px;
+     line-height: 1.5;
+     border-radius: 0.37rem;
+}
+ .btn-light {
+     cursor: pointer;
+}
+ .type_name {
+     margin-right:20px;
+     margin-bottom:10px;
+     margin-top:10px;
+     color:#fff;
+     background-color: #5bc0de;
+}
+ .btn-light:hover {
+     background-color: #fff;
+     border-color: #989898;
+}
+ .btn-medium {
+     font-size: 12px;
+     padding: 10px 22px;
+     display: inline-block;
+     margin-right: 20px;
+     letter-spacing: 2px;
+     border: 1px solid #157af6;
+     width: 100%;
+}
+ .highlight-button:hover {
+     background-color: #157af6;
+     border: 2px solid #157af6;
+     color: #fff;
+}
+ 

@@ -1,0 +1,13 @@
+website/static/img
+document/
+.DS_Store
+.idea
+*.vs
+*.log
+.env
+*.jpg
+*.png
+*__pycache__
+*.xml
+*.txt
+*.pytest_cache

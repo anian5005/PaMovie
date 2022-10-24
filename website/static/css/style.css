@@ -1,0 +1,152 @@
+header {
+     width:100%;
+}
+ .nav_outer {
+     display: flex;
+     justify-content: center;
+     background: black;
+}
+ .nav_container {
+     width: 1040px;
+     height: 80px;
+     display: flex;
+     align-items: center;
+     gap: 30px;
+}
+ body{
+     height: 100%;
+     margin: 0;
+     font-family: 微軟正黑體, Arial, Helvetica, sans-serif;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     background: #1f1f1f;
+}
+ nav {
+     width: 900px;
+     display: flex;
+     align-items: center;
+     gap: 30px;
+}
+ input {
+     width: 250px;
+     height: 25px;
+     border-radius: 10px;
+}
+ .container {
+     display: flex;
+     flex-direction: column;
+}
+ .movie_info {
+     width: 900px;
+     display: flex;
+     flex-direction: column;
+     justify-content: flex-start;
+}
+ #movie_poster{
+     border-radius:2%;
+}
+ .info_body {
+     display: flex;
+     gap: 45px;
+}
+ .rating {
+     display:flex;
+     margin-bottom: 20px;
+}
+ .rating_icon {
+     width: 50px;
+     height:50px;
+     margin-right: 20px;
+}
+ .rating p {
+     display: inline;
+     margin-right: 10px;
+}
+ .rating_value {
+     font-size: 15px;
+}
+ .gray {
+     color: gray;
+     margin-right: 30px;
+}
+ .imdb_rating, .tomato_rating,.tomato_audience_rating, .yahoo_rating {
+     width: 900px;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     border-bottom: 1px solid #DBDBDB;
+     border-top: 1px solid #DBDBDB;
+}
+ .rating_name{
+     font-size:15px;
+     font-family:Arial Black,微軟正黑體;
+     width: 150px;
+     display: flex;
+     justify-content:flex-start;
+}
+ .horizontal_line {
+     background-color: #444;
+     width: 800px;
+     height: 1px;
+}
+ .info_body{
+     width: 620px;
+     display: flex;
+}
+ .info_detail{
+     width: 420px;
+}
+ .rating_no_result {
+     font-family:Arial Black,微軟正黑體;
+     font-size: 25px;
+     color: #A9A9A9;
+}
+ p.detail_word {
+     width:600px;
+}
+ .detail_word{
+     font-family:Arial Black,微軟正黑體;
+     font-size: 20px;
+     font-weight: bold;
+    /* color: #ffffff;
+    */
+}
+ p, h1, h2, h3, h4 {
+     font-family:Arial Black,微軟正黑體;
+     color:white;
+}
+ li , ul {
+     color:white;
+}
+ h1::before {
+     content: "|";
+     font-family: Arial Black;
+     font-weight:bolder;
+     color:#5bc0de;
+     font-size:45px;
+     margin-right:5px;
+}
+ h2::before, h1::before {
+     content: "|";
+     color:#5bc0de;
+     font-size:35px;
+     margin-right:5px;
+}
+ .movie_title::before {
+     content: "|";
+     font-family: Arial Black;
+     font-weight:bolder;
+     color:#5bc0de;
+     font-size:45px;
+}
+ .bubble_chart_container{
+     display:flex;
+     flex-direction: row;
+}
+ .bubble_chart {
+     display:flex;
+     flex-direction: column;
+     margin-right: 35px;
+     align-items: center;
+}
