@@ -189,7 +189,6 @@ def multi_thread_scrape_douban_detail_page_and_save_img(crawler_worker_num, cook
     # step 1: scrapying douban movie detail pages
     function_resource_args_list = ['sql_conn', 'mongo_conn']
     imdb_list = get_douban_id_dict_list()
-    print('job num', len(imdb_list))
 
     # step 2 : create douban cookies
     if len(imdb_list) > 0:

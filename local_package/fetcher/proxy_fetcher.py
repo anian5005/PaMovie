@@ -12,7 +12,7 @@ PROXY_URL_WITH_KEY = os.getenv('PROXY_URL_WITH_KEY')
 
 def my_address_ip():
     response = requests.get("https://httpbin.org/ip")
-    print(response.text)
+    return response.text
 
 
 def get_proxy_from_webshare():

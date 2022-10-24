@@ -72,7 +72,6 @@ def imdb_mapping_douban_id(imdb_id, sql_conn, driver):
     # find result element
     try:
         result = driver.find_element(By.CLASS_NAME, 'sc-gqjmRU').text
-        # print('sc-bZQynM result', result)
         if '没有找到' in result:
             douban_row = {'imdb_id': imdb_id, 'douban_id': 0}
             update_on_duplicate_key(sql_conn, 'movie_id_mapping', [douban_row], multi_thread=True)
@@ -120,7 +119,6 @@ def get_imdb_id_list_douban_id_is_null():
 def multi_thread_imdb_mapping_douban_id(worker_num):
     function_resource_args_list = ['sql_conn', 'driver']
     imdb_list = get_imdb_id_list_douban_id_is_null()
-    print('job num', len(imdb_list))
     multi_thread_cookies_creator = SeleniumCrawler(
         id_list=imdb_list,
         worker_num=worker_num,

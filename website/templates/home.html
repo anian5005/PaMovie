@@ -6,7 +6,6 @@
         <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='img/pa_logo.ico')}}">
         <meta charset="utf-8">
         <title>Pa Movie</title>
-        <script>console.log('home script');</script>
 
         <link rel="stylesheet"  href="{{url_for('static', filename='css/home_style.css')}}">
         <script src="{{url_for('static', filename='js/home.js')}}"></script>
@@ -198,7 +197,6 @@
         <button onclick="goToTop();" id="goToTopBtn" style="display: block;"> TOP </button>
 
         <script>
-            console.log('HTML:', 'updateMovieByFilter')
             updateMovieByFilter(10);
             tagFilterMutualExclusivity();
         </script>

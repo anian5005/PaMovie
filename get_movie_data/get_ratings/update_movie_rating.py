@@ -87,7 +87,6 @@ def update_douban_rating(imdb_id, douban_id, sql_conn, douban_cookies_doc, proxy
         my_cookies = douban_cookies_doc['cookies_list']
 
         response = requests.get(url=url, headers=headers, proxies={'https': proxy}, cookies=my_cookies)
-        print('status code', response.status_code)
         soup = BeautifulSoup(response.text, "html.parser")
 
         # anti-spider: return the empty content or 403
@@ -128,7 +127,6 @@ def update_douban_rating(imdb_id, douban_id, sql_conn, douban_cookies_doc, proxy
                         'douban_votes': int(rating_count),
                         'douban_updated': log_date
                     }
-                    # print('data_dict', data_dict)
                     update_on_duplicate_key(sql_conn, 'movie_rating', [data_dict], multi_thread=True)
                     return 1
 
@@ -309,7 +307,6 @@ def multi_thread_update_douban_ratings(worker_num, target_docs_num):
 
     # update douban rating
     save_douban_cookies_into_mongo(target_docs_num=target_docs_num, worker_num=1)
-    print('save_douban_cookies finished')
 
     function_resource_args_list = ['sql_conn', 'douban_cookies', 'proxy']
     multi_thread_douban_crawler = DoubaonCookiesCrawler(
@@ -320,7 +317,6 @@ def multi_thread_update_douban_ratings(worker_num, target_docs_num):
         table='movie_rating',
         resource_list=function_resource_args_list)
     multi_thread_douban_crawler.create_worker()
-    print('update douban rating finished')
     douban_end = time.time()
 
     # douban no rating
