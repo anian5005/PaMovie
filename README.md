@@ -72,7 +72,6 @@ Create a conditional filter to filter the movie list from Rotten Tomatoes web se
 
 #### Networking
 * https
-* SSL
 * Domain Name system
 * Nginx
 
